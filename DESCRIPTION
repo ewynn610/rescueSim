@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: Elizabeth Wynn <elizabeth.2.wynn@cuanschutz.edu>
 Maintainer: Elizabeth Wynn <elizabeth.2.wynn@cuanschutz.edu>
 Description: Simulate data from repeated measures scRNA-seq studies
-License: What license is it under?
+License: GPL-3
 Imports: 
     checkmate,
     edgeR,
