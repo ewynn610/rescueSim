@@ -47,8 +47,8 @@ In this vignette, we outline:
 -   How to generate and update an object for storing simulation
     parameters
 -   How to estimate simulation parameters from a dataset
--   What simulation properties and parameters can be adjusted by the
-    user
+-   How to simulate data using simulation parameters
+-   The effect of adjusting some of the simulation parameters on the simulated data
 
 # Installation
 
