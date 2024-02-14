@@ -529,6 +529,7 @@ estRescueParams <- function(sce, paramObj = NULL,
 .estNCellParams <- function(sce, sampleVariable, cellParamsByCondition,
                             groupVariable, timepointVariable,
                             nTimepoints, twoGroupDesign) {
+
   if (!cellParamsByCondition) {
     if (is.null(sampleVariable)) {
       minCells <- maxCells <- ncol(sce)
@@ -565,7 +566,7 @@ estRescueParams <- function(sce, paramObj = NULL,
         sce[[timepointVariable]],
         sep = "_"
       )
-      groupVariable <- sce[[groupVariable]]
+      #groupVariable <- sce[[groupVariable]]
       num_cell_tab <- table(sce[[sampleVariable]], groupVariable)
       minCells <- apply(num_cell_tab, 2, function(x) min(x[x != 0]))
       maxCells <- apply(num_cell_tab, 2, function(x) max(x[x != 0]))
