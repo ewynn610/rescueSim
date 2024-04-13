@@ -36,9 +36,16 @@ cells represented by columns.}
 }
 }
 \description{
-Simulate Repeated Measures scRNA-seq Data using the Rescue method
+Simulate Repeated Measures scRNA-seq Data using the RESCUE method
 }
 \examples{
-# example code
+# Read in parameter object
+RecAM_params
+
+# Simulate data
+simDat=simRescueData(RecAM_params)
+
+# Examine
+counts(mySim)[1:5, 1:5]
 
 }

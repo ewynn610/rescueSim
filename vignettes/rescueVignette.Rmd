@@ -1,5 +1,5 @@
 ---
-title: "Rescue: REpeated measures Single Cell RNA-seqUEncing data simulation"
+title: "RESCUE: REpeated measures Single Cell RNA-seqUEncing data simulation"
 output:
   html_document:
     toc: true
@@ -27,14 +27,14 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-Rescue is an R package for simulating single-cell RNA-sequencing
+RESCUE is an R package for simulating single-cell RNA-sequencing
 (scRNA-seq) data from repeated measures designs, such as longitudinal
 studies. One benefit of these types of studies is they allow researchers
 to investigate changes in gene expression over time for a specific cell
 type. Realistic simulated data data can be used to evaluate analysis
 methods and assess power under a variety of settings.
 
-The Rescue package uses a gamma-poisson framework to simulate data from
+The RESCUE package uses a gamma-poisson framework to simulate data from
 individual cell-types while mimicking important attributes of empirical
 data, between-sample variability (i.e. data from cells from the same
 sample are correlated) and between-subject variability (i.e. data from
@@ -48,11 +48,12 @@ In this vignette, we outline:
     parameters
 -   How to estimate simulation parameters from a dataset
 -   How to simulate data using simulation parameters
--   The effect of adjusting some of the simulation parameters on the simulated data
+-   The effect of adjusting some of the simulation parameters on the
+    simulated data
 
 # Installation
 
-Rescue is available on github at: <https://github.com/ewynn610/Rescue>.
+RESCUE is available on github at: <https://github.com/ewynn610/RESCUE>.
 
 It can be installed using:
 
@@ -60,12 +61,12 @@ It can be installed using:
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
-devtools::install_github("https://github.com/ewynn610/Rescue")
+devtools::install_github("https://github.com/ewynn610/RESCUE")
 ```
 
 # Simulation Overview
 
-Rescue simulates a data set for a *single* cell type with gene
+RESCUE simulates a data set for a *single* cell type with gene
 expression counts for cells from several samples, with multiple samples
 coming from individual subjects. If a user wants data from several cell
 types, this process can be repeated to generate data for each cell type
@@ -117,8 +118,11 @@ collected from five subjects at two timepoints per subject.
 
 ```{r}
 ## Load neccessary packages
-library(Rescue)
+library(RESCUE)
 library(SingleCellExperiment)
+
+## set seed for reproducibility
+set.seed(24)
 
 ## Load data
 data("RecAM_sce")
@@ -169,13 +173,13 @@ myParams
 
 We can see that the object contains slots for a variety of parameters
 which are empty by default. These slots represent the parameters in the
-left hand side of figure REF used to simulate the data as well as other
+left hand side of figure 1 used to simulate the data as well as other
 data properties such as the number of timepoints or subjects.
 
 The table below gives an details about the simulation parameters.
 
 |     Parameter      | Symbol in Fig. 1 (if applicable) |                                                                                                   Description                                                                                                    |                                                                                                                                                                         Acceptable Values                                                                                                                                                                          |
-|:---------------:|:---------------:|:---------------:|:---------------------:|
+|:------------------:|:--------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 |   `nTimepoints`    |                \-                |                                                                                 Number of timepoints (i.e. samples) per subject                                                                                  |                                                                      Single numeric value \>0 representing the number of timepoints for all subjects, or a vector the same length as the number of total subjects with each value representing the number of timepoints for a single subject.                                                                      |
 |  `twoGroupDesign`  |                \-                |                                                            Logical value indicating whether to simulate two groups (ex. treatment and control group)                                                             |                                                                                                                                             Logical value with `TRUE` indicating that two groups should be simulated.                                                                                                                                              |
 |  `nSubjsPerGroup`  |                \-                |                                                   Number of subjects per group (if using two group design) or number of total subjects (if only single group)                                                    |                                                                                    A single numeric value \>0 indicating the number of subjects per group, or or a vector of two values with each value representing the subjects for one group (if using a two group design).                                                                                     |
@@ -240,7 +244,7 @@ and sample, subject, timepoint, and group meta data (where applicable)
 in `colData`. The table below outlines other function arguments.
 
 |        Argument         | Description                                                                                                                                                                                                                                                                                             | Default |
-|:---------------:|---------------------------------------|:---------------:|
+|:-----------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
 |          `sce`          | `SingleCellExperiment` object containing empirical data with a counts matrix in the `counts` slot.                                                                                                                                                                                                      |   \-    |
 |       `paramObj`        | `RescueParams` object with empty slots for parameters which need to be estimated. If `NULL`, all parameter values will be estimated.                                                                                                                                                                    | `NULL`  |
 |    `sampleVariable`     | String denoting name of sample identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, data is assumed to contain only one sample parameters `logLibFacVar`, `sampleFacVarMean`, `sampleFacVarSD`, `subjectFacVarMean`, and `subjectFacVarSD` parameters cannot be estimated. | `NULL`  |
@@ -374,7 +378,7 @@ myParams <- estRescueParams(RecAM_sce,
 A question likely to arise in repeated measures scRNA-seq analysis and
 study planning is how the sample size will impact results. In these
 experiments, there are different aspects of sample size, all of which
-can be controlled in using the `Rescue` simulation method:
+can be controlled in using the `RESCUE` simulation method:
 
 -   Number of timepoints (samples) per subject (`nTimepoints`)
 
@@ -563,7 +567,7 @@ boxplot(log(libSizes) ~ sample,
 
 ## Between Subject/Sample Variation
 
-To simulate between-sample and between-subject variation, `Rescue` uses
+To simulate between-sample and between-subject variation, `RESCUE` uses
 gene specific sample- and subject- level multiplicative factors which
 are multiplied with the mean gene expression for each gene, with the
 resulting value being used later in simulation (see Figure 1, step 1).
@@ -661,7 +665,7 @@ scater::plotTSNE(simDat_bigsubjectFacVarMean, colour_by = "subjectID")
 
 ## Differential Expression
 
-`Rescue` allows the user to simulate differential expression between
+`RESCUE` allows the user to simulate differential expression between
 timepoints/groups using two parameters which must be manually set by the
 user: `propDE` which controls the proportion of genes differentially
 expressed, and `deLogFC` which controls the log$_2$ fold change values
@@ -701,7 +705,7 @@ timepoints with a $\pm1$ log$_2$ fold change, cells from different
 timepoints cluster separately.
 
 If we simulate three timepoints, the cells cluster sequentially by
-timepoint since `Rescue` simulates linear differential expression across
+timepoint since `RESCUE` simulates linear differential expression across
 time.
 
 ```{r}

@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(Rescue)
+library(RESCUE)
 
-test_check("Rescue")
+test_check("RESCUE")
