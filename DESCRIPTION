@@ -1,5 +1,5 @@
 Type: Package
-Package: Rescue
+Package: RESCUE
 Title: Repeated Measures Single Cell RNA-sequencing Data Simulation
 Version: 0.1.0
 Author: Elizabeth Wynn <elizabeth.2.wynn@cuanschutz.edu>
@@ -30,7 +30,7 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
 Depends: 
-    R (>= 3.6.0)
+    R (>= 4.4.0)
 LazyData: false
 URL: https://github.com/ewynn610/Rescue
 BugReports: https://github.com/ewynn610/Rescue/issues

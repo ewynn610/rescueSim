@@ -1,6 +1,6 @@
 #' The RescueParams Class
 #'
-#' Class for holding parameters used to simulate data using \code{Rescue}
+#' Class for holding parameters used to simulate data using \code{RESCUE}
 #'
 #' @slot nTimepoints Number of timepoints (i.e. samples) per subject.
 #' Holds a single numeric value >0 representing the number of timepoints for
@@ -10,7 +10,7 @@
 #' (ex. treatment and control group).
 #' @slot nSubjsPerGroup Number of subjects per group (if using two group design)
 #'  or number of total subjects (if only single group). Holds a single
-#'  numeric value >0 indicating the number of subjects per group, or or a vector
+#'  numeric value >0 indicating the number of subjects per group, or a vector
 #'   of two values with each value representing the subjects for one group (if
 #'   using a two group design).
 #' @slot maxCellsPerSamp Maximum parameter used when drawing number of cells per

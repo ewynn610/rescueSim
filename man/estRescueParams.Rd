@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimateParams.R
 \name{estRescueParams}
 \alias{estRescueParams}
-\title{Estimate Rescue Parameters}
+\title{Estimate RESCUE Parameters}
 \usage{
 estRescueParams(
   sce,
@@ -77,7 +77,7 @@ myParams_estimated <- estRescueParams(
   subjectVariable = "subjectID",
   timepointVariable = "time",
   groupVariable = NULL, nonDEGs = NULL,
-  cellParamsByCondition = F
+  cellParamsByCondition = FALSE
 )
 
 ## Example using Single timepoint data

@@ -1,4 +1,4 @@
-#' Estimate Rescue Parameters
+#' Estimate RESCUE Parameters
 #'
 #' Estimate parameters to be used to simulate repeated measures scRNA-Seq data
 #' @param sce \code{\link[SingleCellExperiment]{SingleCellExperiment}} object

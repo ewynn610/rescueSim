@@ -1,7 +1,7 @@
-# Rescue: Repeated measures single cell RNA-sequencing data simulation
+# RESCUE: Repeated measures single cell RNA-sequencing data simulation
 ## Getting started 
 
-Rescue is a package for simulating repeated measures scRNA-Seq data. It can be installed from github using the following code:
+REWCUE is a package for simulating repeated measures scRNA-Seq data. It can be installed from github using the following code:
 
 ```{r}
 if (!requireNamespace("devtools", quietly = TRUE)) {

@@ -5,7 +5,7 @@
 \alias{RescueParams-class}
 \title{The RescueParams Class}
 \description{
-Class for holding parameters used to simulate data using \code{Rescue}
+Class for holding parameters used to simulate data using \code{RESCUE}
 }
 \section{Slots}{
 
@@ -20,7 +20,7 @@ with each value representing the number of timepoints for a single subject.}
 
 \item{\code{nSubjsPerGroup}}{Number of subjects per group (if using two group design)
 or number of total subjects (if only single group). Holds a single
-numeric value >0 indicating the number of subjects per group, or or a vector
+numeric value >0 indicating the number of subjects per group, or a vector
  of two values with each value representing the subjects for one group (if
  using a two group design).}
 
@@ -38,8 +38,9 @@ indicating the minimum number of cells per sample, or a vector with length
 equal to the number of conditions (group/timepoint combinations) with each
 value representing the minimum for a single condition, or a vector with
 length equal to the number of total samples with each value representing
-the minimum for a single sample.
-@slot logLibMean Mean library size (log scale) parameter. Used to draw
+the minimum for a single sample.}
+
+\item{\code{logLibMean}}{Mean library size (log scale) parameter. Used to draw
 library size from a log-normal distribution. Holds a single value >0
 indicating the mean library size on a log scale.}
 

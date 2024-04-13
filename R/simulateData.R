@@ -1,6 +1,6 @@
 #' Simulate Repeated Measures scRNA-seq Data
 #'
-#' Simulate Repeated Measures scRNA-seq Data using the Rescue method
+#' Simulate Repeated Measures scRNA-seq Data using the RESCUE method
 #'
 #' @param paramObj \code{\link{RescueParams-class}} object with no empty slots.
 #'
@@ -118,6 +118,11 @@ simRescueData <- function(paramObj) {
     colData = colDat,
     rowData = rowDat
   )
+  ## Order by subjectID and sampleID
+  sce=sce[,order(colDat[,"subjectID"],colDat[,"sampleID"] )]
+
+  sce
+
 }
 
 
