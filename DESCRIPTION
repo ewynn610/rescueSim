@@ -1,13 +1,13 @@
 Type: Package
 Package: RESCUE
 Title: Repeated Measures Single Cell RNA-sequencing Data Simulation
-Version: 0.1.0
-Author: Elizabeth Wynn <elizabeth.2.wynn@cuanschutz.edu>
-Maintainer: Elizabeth Wynn <elizabeth.2.wynn@cuanschutz.edu>
-Description: Simulate data from repeated measures scRNA-seq studies
+Version: 0.99.0
+Authors@R: c(person("Elizabeth", "Wynn",role = c("aut", "cre"), email = "wynne@njhealth.org"))
+Description: A package for simulating data from repeated measures scRNA-seq studies.
 License: GPL-3
 Imports: 
     checkmate,
+    dplyr,
     edgeR,
     graphics,
     gtools,
@@ -28,7 +28,7 @@ biocViews: SingleCell, RNASeq, Transcriptomics, DifferentialExpression,
     GeneExpression
 Config/testthat/edition: 3
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Depends: 
     R (>= 4.4.0)
 LazyData: false

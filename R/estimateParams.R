@@ -349,12 +349,12 @@ estRescueParams <- function(sce, paramObj = NULL,
 ## Estimate mean (normalized) expression
 .estMeanExpr <- function(sce, sampleVariable) {
   if (!is.null(sampleVariable)) {
-    samp_means <- stats::aggregate(
-      as.matrix(Matrix::t(SingleCellExperiment::normcounts(sce))),
-      list(samples = sce[[sampleVariable]]),
-      FUN = mean
-    )
-    gene_means <- colMeans(samp_means[, -1])
+    samp_means=suppressMessages(dplyr::bind_cols(lapply(unique(sce[[sampleVariable]]), function(x){
+      rowMeans(SingleCellExperiment::normcounts(sce)[,sce[[sampleVariable]]==x])
+    })))
+
+    gene_means=rowMeans(samp_means)
+    names(gene_means)=names(sce)
   } else {
     gene_means <- Matrix::rowMeans(SingleCellExperiment::normcounts(sce))
   }
@@ -390,8 +390,8 @@ estRescueParams <- function(sce, paramObj = NULL,
     phi <- phi[nonDEGs]
     means <- means[nonDEGs]
   }
-  perc0 <- Matrix::rowSums(SingleCellExperiment::normcounts(sce) == 0) /
-    ncol(SingleCellExperiment::normcounts(sce))
+  perc0 <- Matrix::rowSums(SingleCellExperiment::counts(sce) == 0) /
+    ncol(SingleCellExperiment::counts(sce))
   idx_keep <- perc0 < perc_0_keep
   sce <- sce[idx_keep, ]
   phi <- phi[idx_keep]

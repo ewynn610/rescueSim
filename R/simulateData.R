@@ -31,13 +31,14 @@
 #'
 #' @examples
 #' # Read in parameter object
-#' RecAM_params
+#' data("RecAM_params")
 #'
 #' # Simulate data
 #' simDat=simRescueData(RecAM_params)
 #'
 #' # Examine
-#' counts(mySim)[1:5, 1:5]
+#' library(SingleCellExperiment)
+#' counts(simDat)[1:5, 1:5]
 #'
 #' @export
 
@@ -321,17 +322,15 @@ simRescueData <- function(paramObj) {
   return(list(de = de, deFacs = de_facs))
 }
 
-.simTrueExprs <- function(dispersion, exprsMean, de, a, b) {
+## Changed to round(ncells) so it will work for really big numbers
+.simTrueExprs=function (dispersion, exprsMean, de, a, b)
+{
   n_cells <- ncol(de)
-
   x_new <- a * b * de * exprsMean
   ngenes <- nrow(x_new)
   ncells <- ncol(x_new)
-
-  ## Simulate true exprs. with gamma distribution
-  mat <- matrix(stats::rgamma(ngenes * ncells, shape = 1 / dispersion, scale = x_new * dispersion),
-    nrow = ngenes, ncol = ncells
-  )
+  mat <- matrix(stats::rgamma(ngenes * round(ncells), shape = 1/dispersion,
+                              scale = x_new * dispersion), nrow = ngenes, ncol = ncells)
   rownames(mat) <- names(exprsMean)
   idx_invar <- which(dispersion == 0)
   for (idx in idx_invar) {
@@ -348,7 +347,7 @@ simRescueData <- function(paramObj) {
   trueExprsCorrected <- t(libSizes * t(trueExprs / colSums(trueExprs)))
 
   ## For each cell, draw count from Poisson with mean trueExprs
-  counts <- matrix(stats::rpois(ncells * ngenes, lambda = trueExprsCorrected),
+  counts <- matrix(stats::rpois(round(ncells) * ngenes, lambda = trueExprsCorrected),
     nrow = ngenes, ncol = ncells
   )
   if (is.null(rownames(trueExprsCorrected))) {

@@ -4,15 +4,12 @@
 #'
 #' @slot nTimepoints Number of timepoints (i.e. samples) per subject.
 #' Holds a single numeric value >0 representing the number of timepoints for
-#' all subjects, or a vector the same length as the number of total subjects
-#' with each value representing the number of timepoints for a single subject.
+#' all subjects.
 #' @slot twoGroupDesign Logical value indicating whether to simulate two groups
 #' (ex. treatment and control group).
 #' @slot nSubjsPerGroup Number of subjects per group (if using two group design)
 #'  or number of total subjects (if only single group). Holds a single
-#'  numeric value >0 indicating the number of subjects per group, or a vector
-#'   of two values with each value representing the subjects for one group (if
-#'   using a two group design).
+#'  numeric value >0 indicating the number of subjects per group.
 #' @slot maxCellsPerSamp Maximum parameter used when drawing number of cells per
 #'  sample from a discrete uniform distribution. Holds a single numeric value
 #'   >0 indicating the maximum number of cells per sample, or a vector with
@@ -54,7 +51,7 @@
 #' of sample-level multiplicative factors. Larger values result in more
 #' variation in amount of between-sample variation across different genes.
 #' Must be a value >=0
-#' @slot subjectVarMean Mean used for drawing variance (log-scale) of
+#' @slot subjectFacVarMean Mean used for drawing variance (log-scale) of
 #' subject-level multiplicative factors. Larger values result in larger
 #' between-subject variation.
 #' @slot subjectFacVarSD Standard deviation used for drawing variance
@@ -234,6 +231,7 @@ setValidity("RescueParams", rescueParamsValidity)
 
 .checkSingleValueParams <- function(param_lengths) {
   singleValueSlots <- c(
+    "nTimepoints", "nSubjsPerGroup",
     "logLibFacVar", "logLibMean", "logLibSD",
     "sampleFacVarMean",
     "sampleFacVarSD",
@@ -272,42 +270,6 @@ setValidity("RescueParams", rescueParamsValidity)
   return(exprsDispError)
 }
 
-.checknSubjsLength <- function(object, param_lengths) {
-  nSubjsError <- NULL
-  if (param_lengths["twoGroupDesign"] == 1) {
-    if (!getRescueParam(object, "twoGroupDesign") &
-      param_lengths["nSubjsPerGroup"] > 1) {
-      nSubjsError <- "When twoGroupDesign is FALSE, nSubjsPerGroup should contain a single value."
-    } else if (getRescueParam(object, "twoGroupDesign") &
-      param_lengths["nSubjsPerGroup"] > 2) {
-      nSubjsError <- "When twoGroupDesign is TRUE, nSubjsPerGroup should contain a single value (if nSubjsPerGroup is the same in each group) or a vector of two values (if nSubjsPerGroup differs by group)."
-    }
-  } else {
-    if (param_lengths["nSubjsPerGroup"] > 2) {
-      nSubjsError <- "nSubjsPerGroup should contain a single value or a vector of two values (if nSubjsPerGroup differs by group)."
-    }
-  }
-  return(nSubjsError)
-}
-
-.checkTimepointLength <- function(object, param_lengths) {
-  timepointErr <- NULL
-  if (param_lengths["nSubjsPerGroup"] != 0 &
-    param_lengths["twoGroupDesign"] == 1 &
-    param_lengths["nTimepoints"] != 0) {
-    nsubjs <- ifelse(param_lengths["nSubjsPerGroup"] == 2,
-      sum(getRescueParam(object, "nSubjsPerGroup")),
-      ifelse(getRescueParam(object, "twoGroupDesign"),
-        2 * getRescueParam(object, "nSubjsPerGroup"),
-        getRescueParam(object, "nSubjsPerGroup")
-      )
-    )
-    if (param_lengths["nTimepoints"] > 1 & param_lengths["nTimepoints"] != nsubjs) {
-      timepointErr <- "Parameter nTimepoints should be a single value representing the number of timepoints for all subjects, or a vector the same length as the number of total subjects with each value representing the number of timepoints for a single subject."
-    }
-  }
-  return(timepointErr)
-}
 
 .checkCellsPerSampLength <- function(object, param_lengths, timepointError) {
   cellsPerSampIndicator <- param_lengths[c(
