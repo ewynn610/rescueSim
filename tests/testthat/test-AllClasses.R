@@ -31,10 +31,7 @@ test_that("updateRescueParams working", {
 
 test_that(".checkSingleValueParams working", {
   singleValueSlots <- c(
-<<<<<<< HEAD
-=======
     "nTimepoints", "nSubjsPerGroup",
->>>>>>> bc9c617 (updated package)
     "logLibFacVar", "logLibMean", "logLibSD",
     "sampleFacVarMean",
     "sampleFacVarSD",
@@ -43,11 +40,7 @@ test_that(".checkSingleValueParams working", {
     "propDE",
     "twoGroupDesign"
   )
-<<<<<<< HEAD
-  singleValList <- c(rep(list(c(1, 1)), 8), rep(list(c(F, F)), 1))
-=======
   singleValList <- c(rep(list(c(1, 1)), 10), rep(list(c(F, F)), 1))
->>>>>>> bc9c617 (updated package)
   names(singleValList) <- singleValueSlots
 
 
@@ -72,92 +65,15 @@ test_that(".checkExprsDispLength working", {
   )
 })
 
-<<<<<<< HEAD
-test_that(".checknSubjsLength working", {
-  expect_error(
-    updateRescueParams(fullParams, list(nSubjsPerGroup = c(1, 1))),
-    "When twoGroupDesign is FALSE, nSubjsPerGroup should contain a single value."
-  )
-
-  expect_no_error(updateRescueParams(
-    fullParams,
-    list(
-      nSubjsPerGroup = c(1, 1),
-      twoGroupDesign = T
-    )
-  ))
-
-  expect_error(
-    updateRescueParams(fullParams, list(
-      nSubjsPerGroup = c(1, 1, 1),
-      twoGroupDesign = T
-    )),
-    "When twoGroupDesign is TRUE, nSubjsPerGroup should contain a single value (if nSubjsPerGroup is the same in each group) or a vector of two values (if nSubjsPerGroup differs by group)",
-    fixed = T
-  )
-
-  expect_error(
-    updateRescueParams(blankParams, list(nSubjsPerGroup = c(1, 1, 1))),
-    "nSubjsPerGroup should contain a single value or a vector of two values (if nSubjsPerGroup differs by group).",
-    fixed = T
-  )
-})
-
-test_that(".checkTimepointLength working", {
-  expect_error(
-    updateRescueParams(fullParams, list(nTimepoints = c(2, 2))),
-    "Parameter nTimepoints should be a single value representing the number of timepoints for all subjects, or a vector the same length as the number of total subjects with each value representing the number of timepoints for a single subject."
-  )
-
-  expect_error(
-    updateRescueParams(
-      fullParams,
-      list(
-        nSubjsPerGroup = c(1, 1),
-        twoGroupDesign = T,
-        nTimepoints = c(2, 2, 2)
-      )
-    ),
-    "Parameter nTimepoints should be a single value representing the number of timepoints for all subjects, or a vector the same length as the number of total subjects with each value representing the number of timepoints for a single subject."
-  )
-
-  expect_no_error(
-    updateRescueParams(fullParams, list(
-      nSubjsPerGroup = c(3, 3),
-      twoGroupDesign = T,
-      nTimepoints = rep(2, 6)
-    ))
-  )
-
-  expect_no_error(
-    updateRescueParams(fullParams, list(
-      nSubjsPerGroup = 3,
-      twoGroupDesign = T,
-      nTimepoints = rep(2, 6)
-    ))
-  )
-})
-=======
->>>>>>> bc9c617 (updated package)
 
 test_that(".checkCellsPerSampLength working", {
   wrongParams <- list(
     list(
       nSubjsPerGroup = 2,
-<<<<<<< HEAD
-      nTimepoints = c(2, 2),
-      maxCellsPerSamp = c(1, 1, 1),
-      minCellsPerSamp = c(1, 1, 1)
-    ),
-    list(
-      nSubjsPerGroup = 2,
-=======
->>>>>>> bc9c617 (updated package)
       twoGroupDesign = T,
       nTimepoints = c(2),
       maxCellsPerSamp = c(1, 1, 1),
       minCellsPerSamp = c(1, 1, 1)
-<<<<<<< HEAD
     ),
     list(
       nSubjsPerGroup = c(2, 2),
@@ -165,37 +81,22 @@ test_that(".checkCellsPerSampLength working", {
       nTimepoints = 2,
       maxCellsPerSamp = c(1, 1, 1),
       minCellsPerSamp = c(1, 1, 1)
-=======
->>>>>>> bc9c617 (updated package)
     )
   )
 
   rightParams <- list(
     list(
       nSubjsPerGroup = 2,
-<<<<<<< HEAD
       nTimepoints = c(2, 2),
       maxCellsPerSamp = c(1, 1, 1, 1),
       minCellsPerSamp = c(1, 1, 1, 1)
     ),
     list(
       nSubjsPerGroup = 2,
-=======
->>>>>>> bc9c617 (updated package)
       twoGroupDesign = T,
       nTimepoints = c(2),
       maxCellsPerSamp = rep(1, 8),
       minCellsPerSamp = rep(1, 8)
-<<<<<<< HEAD
-    ),
-    list(
-      nSubjsPerGroup = c(2, 2),
-      twoGroupDesign = T,
-      nTimepoints = 2,
-      maxCellsPerSamp = rep(1, 8),
-      minCellsPerSamp = rep(1, 8)
-=======
->>>>>>> bc9c617 (updated package)
     )
   )
   lapply(wrongParams, function(ls) {

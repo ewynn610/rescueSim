@@ -82,11 +82,8 @@ The simulation process can be broken up into three steps (Figure 1):
 3.  Simulate final count values for each cell with added variability
     representing technical effects.
 
-<<<<<<< HEAD
-![Figure 1 Basic simulation framework](fig1.png)
-=======
+
 ![Figure 1 Basic simulation framework](fig1.png){width=75%}
->>>>>>> bc9c617 (updated package)
 
 As seen in the left hand side of Figure 1, the simulation framework
 relies on a series of parameters. These can be estimated from a data set
@@ -184,15 +181,9 @@ The table below gives an details about the simulation parameters.
 
 |     Parameter      | Symbol in Fig. 1 (if applicable) |                                                                                                   Description                                                                                                    |                                                                                                                                                                         Acceptable Values                                                                                                                                                                          |
 |:------------------:|:--------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-<<<<<<< HEAD
-|   `nTimepoints`    |                \-                |                                                                                 Number of timepoints (i.e. samples) per subject                                                                                  |                                                                      Single numeric value \>0 representing the number of timepoints for all subjects, or a vector the same length as the number of total subjects with each value representing the number of timepoints for a single subject.                                                                      |
-|  `twoGroupDesign`  |                \-                |                                                            Logical value indicating whether to simulate two groups (ex. treatment and control group)                                                             |                                                                                                                                             Logical value with `TRUE` indicating that two groups should be simulated.                                                                                                                                              |
-|  `nSubjsPerGroup`  |                \-                |                                                   Number of subjects per group (if using two group design) or number of total subjects (if only single group)                                                    |                                                                                    A single numeric value \>0 indicating the number of subjects per group, or or a vector of two values with each value representing the subjects for one group (if using a two group design).                                                                                     |
-=======
 |   `nTimepoints`    |                \-                |                                                                                 Number of timepoints (i.e. samples) per subject                                                                                  |                                                                      Single numeric value \>0 representing the number of timepoints for all subjects.                                                                     |
 |  `twoGroupDesign`  |                \-                |                                                            Logical value indicating whether to simulate two groups (ex. treatment and control group)                                                             |                                                                                                                                             Logical value with `TRUE` indicating that two groups should be simulated.                                                                                                                                              |
 |  `nSubjsPerGroup`  |                \-                |                                                   Number of subjects per group (if using two group design) or number of total subjects (if only single group)                                                    |                                                                                    A single numeric value \>0 indicating the number of subjects per group.                                                                                     |
->>>>>>> bc9c617 (updated package)
 | `maxCellsPerSamp`  |                \-                |                                                       Maximum parameter used when drawing number of cells per sample from a discrete uniform distribution                                                        | A single numeric value \>0 indicating the maximum number of cells per sample, or a vector with length equal to the number of conditions (group/timepoint combinations) with each value representing the maximum for a single condition, or a vector with length equal to the number of total samples with each value representing the maximum for a single sample. |
 | `minCellsPerSamp`  |                \-                |                                                       Minimum parameter used when drawing number of cells per sample from a discrete uniform distribution                                                        | A single numeric value \>0 indicating the minimum number of cells per sample, or a vector with length equal to the number of conditions (group/timepoint combinations) with each value representing the minimum for a single condition, or a vector with length equal to the number of total samples with each value representing the minimum for a single sample. |
 |    `logLibMean`    |             $\mu_L$              |                                                        Mean library size (log scale) parameter. Used to draw library size from a log-normal distribution.                                                        |                                                                                                                                                A single value \>0 indicating the mean library size on a log scale.                                                                                                                                                 |
@@ -603,11 +594,8 @@ Using a low value (-10) for `sampleFacVarMean` leads to little
 between-sample variation, and so we see in the TSNE plot that the
 samples don't cluster together
 
-<<<<<<< HEAD
-```{r}
-=======
+
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Set sampleFacVarMean to -10
 myParams_smallsampleFacVarMean <- updateRescueParams(myParams, list(sampleFacVarMean = -10))
 
@@ -626,11 +614,8 @@ scater::plotTSNE(simDat_smallsampleFacVarMean, colour_by = "sampleID")
 If we increase the value to -3, the samples cluster very tightly by
 sample.
 
-<<<<<<< HEAD
-```{r}
-=======
+
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Set sampleFacVarMean to -3
 myParams_bigsampleFacVarMean <- updateRescueParams(myParams, list(sampleFacVarMean = -3))
 
@@ -649,11 +634,7 @@ scater::plotTSNE(simDat_bigsampleFacVarMean, colour_by = "sampleID")
 The same is true if we look at the effect of increasing the
 `subjectFacVarMean` on subject-level clustering.
 
-<<<<<<< HEAD
-```{r}
-=======
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Set subjectFacVarMean to -3
 myParams_smallsubjectFacVarMean <- updateRescueParams(myParams, list(subjectFacVarMean = -10))
 
@@ -669,11 +650,8 @@ simDat_smallsubjectFacVarMean <- scater::runTSNE(simDat_smallsubjectFacVarMean)
 scater::plotTSNE(simDat_smallsubjectFacVarMean, colour_by = "subjectID")
 ```
 
-<<<<<<< HEAD
-```{r}
-=======
+
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Set subjectFacVarMean to -3
 myParams_bigsubjectFacVarMean <- updateRescueParams(myParams, list(subjectFacVarMean = -3))
 
@@ -713,11 +691,8 @@ differential expression impacts cell clustering.
 If we simulate with no differential expression, cells from both
 timepoints cluster together.
 
-<<<<<<< HEAD
-```{r}
-=======
+
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Estimate data with no differential expression (default)
 simDat_noDE <- simRescueData(myParams)
 
@@ -738,11 +713,8 @@ If we simulate three timepoints, the cells cluster sequentially by
 timepoint since `RESCUE` simulates linear differential expression across
 time.
 
-<<<<<<< HEAD
-```{r}
-=======
+
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Manually changing DE Params
 myParams_de_2timepoints <- updateRescueParams(myParams, list(
   propDE = .2, deLogFC = 1
@@ -760,11 +732,8 @@ simDat_de_2timepoints <- scater::runTSNE(simDat_de_2timepoints)
 scater::plotTSNE(simDat_de_2timepoints, colour_by = "time")
 ```
 
-<<<<<<< HEAD
-```{r}
-=======
+
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Manually changing DE Params
 myParams_de_3timepoints <- updateRescueParams(myParams, list(
   propDE = .2, deLogFC = 1,
@@ -788,11 +757,8 @@ final timepoint and last group, which is simulated to be differentially
 expressed relative to the other groups/times, cluster separately from
 the rest of the cells.
 
-<<<<<<< HEAD
-```{r}
-=======
+
 ```{r fig.width=10, fig.height=6, dpi=50}
->>>>>>> bc9c617 (updated package)
 ## Manually changing DE Params
 myParams_de_2groups <- updateRescueParams(myParams, list(
   propDE = .2, deLogFC = 1,
