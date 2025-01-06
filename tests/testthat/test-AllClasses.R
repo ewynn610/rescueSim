@@ -74,23 +74,10 @@ test_that(".checkCellsPerSampLength working", {
       nTimepoints = c(2),
       maxCellsPerSamp = c(1, 1, 1),
       minCellsPerSamp = c(1, 1, 1)
-    ),
-    list(
-      nSubjsPerGroup = c(2, 2),
-      twoGroupDesign = T,
-      nTimepoints = 2,
-      maxCellsPerSamp = c(1, 1, 1),
-      minCellsPerSamp = c(1, 1, 1)
     )
   )
 
   rightParams <- list(
-    list(
-      nSubjsPerGroup = 2,
-      nTimepoints = c(2, 2),
-      maxCellsPerSamp = c(1, 1, 1, 1),
-      minCellsPerSamp = c(1, 1, 1, 1)
-    ),
     list(
       nSubjsPerGroup = 2,
       twoGroupDesign = T,

@@ -194,25 +194,16 @@ rescueParamsValidity <- function(object) {
   ## ExprsMean and dispersion
   exprsDispError <- .checkExprsDispLength(param_lengths)
 
-  ## nSubjsPerGroup
-  nSubjsError <- .checknSubjsLength(object, param_lengths)
-
-
-  ## nTimepoints,
-  timepointsError <- .checkTimepointLength(object, param_lengths)
-
   ## maxCellsPerSamp, minCellsPerSamp
   cellsPerSampError <- .checkCellsPerSampLength(
-    object, param_lengths,
-    timepointsError
+    object, param_lengths
   )
 
   ## Make sure specified parameters are not negative
   paramValuesError <- .checkParamValues(object, param_lengths)
 
   error_string <- c(
-    singleValueError, exprsDispError, nSubjsError,
-    timepointsError, cellsPerSampError
+    singleValueError, exprsDispError, cellsPerSampError
   )
 
 
@@ -271,25 +262,21 @@ setValidity("RescueParams", rescueParamsValidity)
 }
 
 
-.checkCellsPerSampLength <- function(object, param_lengths, timepointError) {
+.checkCellsPerSampLength <- function(object, param_lengths) {
   cellsPerSampIndicator <- param_lengths[c(
     "maxCellsPerSamp",
     "minCellsPerSamp"
   )] > 0
   cellsPerSampErr <- NULL
-  if (any(cellsPerSampIndicator) & is.null(timepointError) &
+  if (any(cellsPerSampIndicator) &
     param_lengths["twoGroupDesign"] == 1) {
-    nsubjs <- ifelse(param_lengths["nSubjsPerGroup"] == 2,
-      sum(getRescueParam(object, "nSubjsPerGroup")),
-      ifelse(getRescueParam(object, "twoGroupDesign"),
+    nsubjs <- ifelse(getRescueParam(object, "twoGroupDesign"),
         2 * getRescueParam(object, "nSubjsPerGroup"),
         getRescueParam(object, "nSubjsPerGroup")
       )
-    )
-    nsamps <- ifelse(param_lengths["nTimepoints"] == 1,
-      nsubjs * getRescueParam(object, "nTimepoints"),
-      sum(getRescueParam(object, "nTimepoints"))
-    )
+
+    nsamps <- nsubjs * getRescueParam(object, "nTimepoints")
+
     cellsPerSampIndicator <-
       param_lengths[c("maxCellsPerSamp", "minCellsPerSamp")] %in%
       c(1, 2, nsamps)
