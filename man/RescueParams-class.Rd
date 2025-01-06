@@ -12,25 +12,14 @@ Class for holding parameters used to simulate data using \code{RESCUE}
 \describe{
 \item{\code{nTimepoints}}{Number of timepoints (i.e. samples) per subject.
 Holds a single numeric value >0 representing the number of timepoints for
-<<<<<<< HEAD
-all subjects, or a vector the same length as the number of total subjects
-with each value representing the number of timepoints for a single subject.}
-=======
 all subjects.}
->>>>>>> bc9c617 (updated package)
 
 \item{\code{twoGroupDesign}}{Logical value indicating whether to simulate two groups
 (ex. treatment and control group).}
 
 \item{\code{nSubjsPerGroup}}{Number of subjects per group (if using two group design)
 or number of total subjects (if only single group). Holds a single
-<<<<<<< HEAD
-numeric value >0 indicating the number of subjects per group, or a vector
- of two values with each value representing the subjects for one group (if
- using a two group design).}
-=======
 numeric value >0 indicating the number of subjects per group.}
->>>>>>> bc9c617 (updated package)
 
 \item{\code{maxCellsPerSamp}}{Maximum parameter used when drawing number of cells per
 sample from a discrete uniform distribution. Holds a single numeric value
@@ -82,11 +71,7 @@ of sample-level multiplicative factors. Larger values result in more
 variation in amount of between-sample variation across different genes.
 Must be a value >=0}
 
-<<<<<<< HEAD
-\item{\code{subjectVarMean}}{Mean used for drawing variance (log-scale) of
-=======
 \item{\code{subjectFacVarMean}}{Mean used for drawing variance (log-scale) of
->>>>>>> bc9c617 (updated package)
 subject-level multiplicative factors. Larger values result in larger
 between-subject variation.}
 

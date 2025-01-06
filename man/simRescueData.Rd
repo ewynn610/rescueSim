@@ -40,21 +40,13 @@ Simulate Repeated Measures scRNA-seq Data using the RESCUE method
 }
 \examples{
 # Read in parameter object
-<<<<<<< HEAD
-RecAM_params
-=======
 data("RecAM_params")
->>>>>>> bc9c617 (updated package)
 
 # Simulate data
 simDat=simRescueData(RecAM_params)
 
 # Examine
-<<<<<<< HEAD
-counts(mySim)[1:5, 1:5]
-=======
 library(SingleCellExperiment)
 counts(simDat)[1:5, 1:5]
->>>>>>> bc9c617 (updated package)
 
 }
