@@ -1,7 +1,7 @@
 # RESCUE: Repeated measures single cell RNA-sequencing data simulation
 ## Getting started 
 
-RESCUE is a package for simulating repeated measures scRNA-Seq data. To install the package, start by ensuring all dependenciesare installed:
+RESCUE is a package for simulating repeated measures scRNA-Seq data. To install the package, start by ensuring all dependencie sare installed:
 ```{r}
 ## Install CRAN dependencies
 install.packages(c("checkmate", "dplyr", "gtools", "Matrix"))
