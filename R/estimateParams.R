@@ -179,13 +179,10 @@ estRescueParams <- function(sce, paramObj = NULL,
     )
     est_indicator_fil <- est_indicator[params_est_first]
 
-    paramObj <- .getParams(
-      names(est_indicator_fil[est_indicator_fil]), paramObj,
-      sce,
-      sampleVariable, subjectVariable,
-      groupVariable, logLibMeanSD,
-      timepointVariable
-    )
+    paramObj <- .getParams(param_names=names(est_indicator_fil[est_indicator_fil]),
+                                    paramObj=paramObj, sce=sce, sampleVariable=sampleVariable,
+                                    subjectVariable=subjectVariable, groupVariable=groupVariable,
+                                    logLibMeanSD=logLibMeanSD, timepointVariable=timepointVariable)
 
     twoGroupDesign <- getRescueParam(paramObj, "twoGroupDesign")
     nTimepoints <- getRescueParam(paramObj, "nTimepoints")
