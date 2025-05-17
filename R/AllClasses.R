@@ -277,6 +277,11 @@ setValidity("RescueParams", rescueParamsValidity)
 
     nsamps <- nsubjs * getRescueParam(object, "nTimepoints")
 
+    nconditions <- ifelse(getRescueParam(object, "twoGroupDesign"),
+                          2 * getRescueParam(object, "nTimepoint"),
+                          getRescueParam(object, "nTimepoints")
+    )
+
     cellsPerSampIndicator <-
       param_lengths[c("maxCellsPerSamp", "minCellsPerSamp")] %in%
       c(1, 2, nsamps)
