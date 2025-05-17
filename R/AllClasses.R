@@ -284,7 +284,7 @@ setValidity("RescueParams", rescueParamsValidity)
 
     cellsPerSampIndicator <-
       param_lengths[c("maxCellsPerSamp", "minCellsPerSamp")] %in%
-      c(1, 2, nsamps)
+      c(1, nconditions, nsamps)
     names(cellsPerSampIndicator) <- c("maxCellsPerSamp", "minCellsPerSamp")
     if (any(!cellsPerSampIndicator)) {
       cellsPerSampErr <-
