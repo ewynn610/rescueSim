@@ -532,19 +532,19 @@ estRescueParams <- function(sce, paramObj = NULL,
       minCells <- maxCells <- ncol(sce)
     } else {
       num_cell_tab <- table(sce[[sampleVariable]])
-      minCells <- min(num_cell_tab)
-      maxCells <- max(num_cell_tab)
+      minCells <- round(quantile(num_cell_tab, .1))
+      maxCells <- round(quantile(num_cell_tab, .9))
     }
   } else {
     nGroups <- ifelse(twoGroupDesign, 2, 1)
     if (is.null(groupVariable) & is.null(timepointVariable)) {
-      stop("To estimatee number of cell parameters by condition,
+      stop("To estimate number of cell parameters by condition,
                   groupVariable and/or timepointVariable must be provided")
     } else if (is.null(groupVariable)) {
       groupVariable <- sce[[timepointVariable]]
       num_cell_tab <- table(sce[[sampleVariable]], groupVariable)
-      minCells <- apply(num_cell_tab, 2, function(x) min(x[x != 0]))
-      maxCells <- apply(num_cell_tab, 2, function(x) max(x[x != 0]))
+      minCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .1)))
+      maxCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .9)))
       if (twoGroupDesign) {
         minCells <- rep(minCells, 2)
         maxCells <- rep(maxCells, 2)
@@ -552,8 +552,8 @@ estRescueParams <- function(sce, paramObj = NULL,
     } else if (is.null(timepointVariable)) {
       groupVariable <- sce[[groupVariable]]
       num_cell_tab <- table(sce[[sampleVariable]], groupVariable)
-      minCells <- apply(num_cell_tab, 2, function(x) min(x[x != 0]))
-      maxCells <- apply(num_cell_tab, 2, function(x) max(x[x != 0]))
+      minCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .1)))
+      maxCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .9)))
       if (nTimepoints > 1) {
         minCells <- rep(minCells, each = nTimepoints)
         maxCells <- rep(maxCells, each = nTimepoints)
@@ -565,8 +565,8 @@ estRescueParams <- function(sce, paramObj = NULL,
       )
       #groupVariable <- sce[[groupVariable]]
       num_cell_tab <- table(sce[[sampleVariable]], groupVariable)
-      minCells <- apply(num_cell_tab, 2, function(x) min(x[x != 0]))
-      maxCells <- apply(num_cell_tab, 2, function(x) max(x[x != 0]))
+      minCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .1)))
+      maxCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .9)))
     }
     group_df <- expand.grid(
       group = paste0(
