@@ -208,7 +208,7 @@ simRescueData <- function(paramObj) {
   fac_vec <- batch_facs[sampleID]
 }
 
-.drawLibSizes <- function(lib_facs, mu, sd) {
+.drawLibSizes <- function(lib_facs, mu, sd, customLibSizes) {
     if(length(customLibSizes)>0){
         customLogLibSizes<-log(customLibSizes)
         mu=mean(customLogLibSizes)
