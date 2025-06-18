@@ -31,6 +31,12 @@
 #' Used to draw library size from a log-normal distribution. Holds a
 #' single value >=0 indicating the standard deviation of library size on
 #' a log scale.
+#' @slot customLibSizes An optional numeric vector of user-provided library sizes. When
+#' provided, library sizes for simulation will be sampled (with replacement)
+#' from this vector instead of the default log-normal distribution.
+#' Log-transformed values are adjusted by a sample specific factor so that the
+#' average log library size equals the overall average multiplied by the
+#' sample-specific factor.
 #' @slot logLibFacVar Variance used for drawing sample-level multiplicative
 #' factors which give different library size distributions for each sample.
 #' Larger values result in larger variation in library size distributions by
@@ -82,6 +88,7 @@ setClass("RescueParams",
     logLibMean = "numeric",
     logLibSD = "numeric",
     logLibFacVar = "numeric",
+    customLibSizes = "numeric",
     exprsMean = "numeric",
     dispersion = "numeric",
     sampleFacVarMean = "numeric",
@@ -310,7 +317,8 @@ setValidity("RescueParams", rescueParamsValidity)
   ## lteq = parameters that can't be less than or equal to 0
   paramsGT0 <- c(
     logLibFacVar = "lt", logLibMean = "lteq",
-    logLibSD = "lt", exprsMean = "lteq",
+    logLibSD = "lt", customLibSizes = "lt",
+    exprsMean = "lteq",
     dispersion = "lteq",
     sampleFacVarSD = "lt",
     subjectFacVarSD = "lt",

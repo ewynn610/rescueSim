@@ -68,7 +68,8 @@ simRescueData <- function(paramObj) {
   libSizes <- .drawLibSizes(
     libSizeFacs,
     getRescueParam(paramObj, "logLibMean"),
-    getRescueParam(paramObj, "logLibSD")
+    getRescueParam(paramObj, "logLibSD"),
+    getRescueParam(paramObj, "customLibSizes")
   )
 
   ## Simulate batch factors
@@ -208,7 +209,21 @@ simRescueData <- function(paramObj) {
 }
 
 .drawLibSizes <- function(lib_facs, mu, sd) {
-  lib_sizes <- stats::rlnorm(length(lib_facs), mu * lib_facs, sd)
+    if(length(customLibSizes)>0){
+        customLogLibSizes<-log(customLibSizes)
+        mu=mean(customLogLibSizes)
+        customMean=mean(customLogLibSizes)
+        rawLogLibSizes<-sample(customLogLibSizes, length(lib_facs), replace = T)
+
+        ## Adjusting so that there is a location shift for sample-specific mu
+        ## sample specific mu will equal mu*lib_fac
+        ## lib_fac is sample specific factor
+        adjLogLibSizes <- rawLogLibSizes + mu * (lib_facs - 1)
+        lib_sizes=as.numeric(exp(adjLogLibSizes))
+    }else{
+        lib_sizes <- stats::rlnorm(length(lib_facs), mu * lib_facs, sd)
+    }
+    return(lib_sizes)
 }
 
 
