@@ -46,9 +46,9 @@ simRescueData <- function(paramObj) {
   ## Check that it is a RescueParams class
   checkmate::assertClass(paramObj, "RescueParams")
 
-  ## Make sure no parameter is equal to zero
+  ## Make sure no parameter (besides customLibSizes) is equal to zero
   check_empty <- vapply(
-    methods::slotNames(paramObj), function(slot) {
+    methods::slotNames(paramObj)[methods::slotNames(paramObj)!="customLibSizes"], function(slot) {
       length(getRescueParam(paramObj, slot)) == 0
     },
     logical(1)
