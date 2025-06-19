@@ -127,6 +127,8 @@ estRescueParams <- function(sce, paramObj = NULL,
 
   ## Go through estimation process if any need to be estimated
   if (any(est_indicator)) {
+      ## Never estimate customLibSizes
+      est_indicator["customLibSizes"] = F
     if (length(getRescueParam(paramObj, "propDE")) == 0) {
       paramObj <- updateRescueParams(paramObj, list(propDE = 0))
       est_indicator["propDE"]=F
