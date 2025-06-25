@@ -79,25 +79,25 @@
 
 
 setClass("RescueParams",
-  slots = c(
-    nTimepoints = "numeric",
-    twoGroupDesign = "logical",
-    nSubjsPerGroup = "numeric",
-    maxCellsPerSamp = "numeric",
-    minCellsPerSamp = "numeric",
-    logLibMean = "numeric",
-    logLibSD = "numeric",
-    logLibFacVar = "numeric",
-    customLibSizes = "numeric",
-    exprsMean = "numeric",
-    dispersion = "numeric",
-    sampleFacVarMean = "numeric",
-    sampleFacVarSD = "numeric",
-    subjectFacVarMean = "numeric",
-    subjectFacVarSD = "numeric",
-    propDE = "numeric",
-    deLogFC = "numeric"
-  )
+         slots = c(
+             nTimepoints = "numeric",
+             twoGroupDesign = "logical",
+             nSubjsPerGroup = "numeric",
+             maxCellsPerSamp = "numeric",
+             minCellsPerSamp = "numeric",
+             logLibMean = "numeric",
+             logLibSD = "numeric",
+             logLibFacVar = "numeric",
+             customLibSizes = "numeric",
+             exprsMean = "numeric",
+             dispersion = "numeric",
+             sampleFacVarMean = "numeric",
+             sampleFacVarSD = "numeric",
+             subjectFacVarMean = "numeric",
+             subjectFacVarSD = "numeric",
+             propDE = "numeric",
+             deLogFC = "ANY"
+         )
 )
 
 
@@ -118,10 +118,10 @@ setClass("RescueParams",
 #'
 #' @export
 
-RescueParams <- function(...) {
-  obj <- methods::new("RescueParams", ...)
-  methods::validObject(obj)
-  obj
+RescueParams <- function(deLogFC = 0, propDE = 0, ...) {
+    obj <- methods::new("RescueParams",deLogFC = deLogFC, propDE = propDE,...)
+    methods::validObject(obj)
+    obj
 }
 
 #' Update RescueParams object
@@ -153,11 +153,11 @@ RescueParams <- function(...) {
 #' @export
 
 updateRescueParams <- function(paramObj, paramValues) {
-  for (name in names(paramValues)) {
-    methods::slot(paramObj, name) <- paramValues[[name]]
-  }
-  methods::validObject(paramObj)
-  paramObj
+    for (name in names(paramValues)) {
+        methods::slot(paramObj, name) <- paramValues[[name]]
+    }
+    methods::validObject(paramObj)
+    paramObj
 }
 
 #' Extract Parameters
@@ -179,7 +179,7 @@ updateRescueParams <- function(paramObj, paramValues) {
 #' @export
 
 getRescueParam <- function(paramObj, paramName) {
-  methods::slot(paramObj, paramName)
+    methods::slot(paramObj, paramName)
 }
 
 
@@ -187,39 +187,46 @@ getRescueParam <- function(paramObj, paramName) {
 
 ## Check param validity
 rescueParamsValidity <- function(object) {
-  ## Make sure values have the right lengths
-  param_lengths <- vapply(
-    methods::slotNames(object), function(slot) {
-      length(slot(object, slot))
-    },
-    numeric(1)
-  )
+    ## Make sure values have the right lengths
+    param_lengths <- vapply(
+        methods::slotNames(object), function(slot) {
+            length(slot(object, slot))
+        },
+        numeric(1)
+    )
 
-  ## Single Value Parameters
-  singleValueError <- .checkSingleValueParams(param_lengths)
+    ## Single Value Parameters
+    singleValueError <- .checkSingleValueParams(param_lengths)
 
-  ## ExprsMean and dispersion
-  exprsDispError <- .checkExprsDispLength(param_lengths)
+    ## ExprsMean and dispersion
+    geneParamLengthError <- .checkGeneParamLengths(param_lengths, methods::slot(object, "deLogFC"))
 
-  ## maxCellsPerSamp, minCellsPerSamp
-  cellsPerSampError <- .checkCellsPerSampLength(
-    object, param_lengths
-  )
+    deLogFCError<-.checkDeLogFCFormat(methods::slot(object, "deLogFC"),
+                                      methods::slot(object, "nTimepoints"),
+                                      methods::slot(object, "twoGroupDesign"))
 
-  ## Make sure specified parameters are not negative
-  paramValuesError <- .checkParamValues(object, param_lengths)
+    ## maxCellsPerSamp, minCellsPerSamp
+    cellsPerSampError <- .checkCellsPerSampLength(
+        object, param_lengths
+    )
 
-  error_string <- c(
-    singleValueError, exprsDispError, cellsPerSampError
-  )
+    ## Make sure specified parameters are not negative
+    paramValuesError <- .checkParamValues(object, param_lengths)
+
+    propDEError<-.checkPropDEUpperBound(methods::slot(object, "propDE"))
+
+    error_string <- c(
+        singleValueError, deLogFCError,geneParamLengthError, cellsPerSampError,
+        propDEError
+    )
 
 
-  names(error_string) <- NULL
-  if (length(error_string) == 0) {
-    return(TRUE)
-  } else {
-    return(error_string)
-  }
+    names(error_string) <- NULL
+    if (length(error_string) == 0) {
+        return(TRUE)
+    } else {
+        return(error_string)
+    }
 }
 
 setValidity("RescueParams", rescueParamsValidity)
@@ -228,139 +235,189 @@ setValidity("RescueParams", rescueParamsValidity)
 
 
 .checkSingleValueParams <- function(param_lengths) {
-  singleValueSlots <- c(
-    "nTimepoints", "nSubjsPerGroup",
-    "logLibFacVar", "logLibMean", "logLibSD",
-    "sampleFacVarMean",
-    "sampleFacVarSD",
-    "subjectFacVarMean",
-    "subjectFacVarSD",
-    "twoGroupDesign",
-    "propDE"
-  )
-  singleValueIndicator <- param_lengths[singleValueSlots] > 1
-  error_string <- vector()
-  if (any(singleValueIndicator)) {
-    singleValueError <- vapply(
-      names(singleValueIndicator[singleValueIndicator]),
-      function(x) {
-        paste(
-          "Parameter", x,
-          "should contain a single value"
-        )
-      },
-      character(1)
+    singleValueSlots <- c(
+        "nTimepoints", "nSubjsPerGroup",
+        "logLibFacVar", "logLibMean", "logLibSD",
+        "sampleFacVarMean",
+        "sampleFacVarSD",
+        "subjectFacVarMean",
+        "subjectFacVarSD",
+        "twoGroupDesign",
+        "propDE"
     )
-  } else {
-    singleValueError <- NULL
-  }
-  return(singleValueError)
+    singleValueIndicator <- param_lengths[singleValueSlots] > 1
+    error_string <- vector()
+    if (any(singleValueIndicator)) {
+        singleValueError <- vapply(
+            names(singleValueIndicator[singleValueIndicator]),
+            function(x) {
+                paste(
+                    "Parameter", x,
+                    "should contain a single value"
+                )
+            },
+            character(1)
+        )
+    } else {
+        singleValueError <- NULL
+    }
+    return(singleValueError)
 }
-
-.checkExprsDispLength <- function(param_lengths) {
-  if (param_lengths["exprsMean"] != param_lengths["dispersion"] &
-    (param_lengths["exprsMean"] != 0 & param_lengths["dispersion"] != 0)) {
-    exprsDispError <-
-      "Parameters exprsMean and dispersion must be vectors of equal length"
-  } else {
-    exprsDispError <- NULL
-  }
-  return(exprsDispError)
-}
-
 
 .checkCellsPerSampLength <- function(object, param_lengths) {
-  cellsPerSampIndicator <- param_lengths[c(
-    "maxCellsPerSamp",
-    "minCellsPerSamp"
-  )] > 0
-  cellsPerSampErr <- NULL
-  if (any(cellsPerSampIndicator) &
-    param_lengths["twoGroupDesign"] == 1) {
-    nsubjs <- ifelse(getRescueParam(object, "twoGroupDesign"),
-        2 * getRescueParam(object, "nSubjsPerGroup"),
-        getRescueParam(object, "nSubjsPerGroup")
-      )
-
-    nsamps <- nsubjs * getRescueParam(object, "nTimepoints")
-
-    nconditions <- ifelse(getRescueParam(object, "twoGroupDesign"),
-                          2 * getRescueParam(object, "nTimepoint"),
-                          getRescueParam(object, "nTimepoints")
-    )
-
-    cellsPerSampIndicator <-
-      param_lengths[c("maxCellsPerSamp", "minCellsPerSamp")] %in%
-      c(1, nconditions, nsamps)
-    names(cellsPerSampIndicator) <- c("maxCellsPerSamp", "minCellsPerSamp")
-    if (any(!cellsPerSampIndicator)) {
-      cellsPerSampErr <-
-        vapply(
-          names(cellsPerSampIndicator[!cellsPerSampIndicator]),
-          function(x) {
-            paste0(
-              "Parameter ", x,
-              " should contain a single value (",
-              x, " for all samples), a vector with length equal to the number of conditions (group/timepoint combinations),or a vector with length equal to the number of total samples."
-            )
-          },
-          character(1)
+    cellsPerSampIndicator <- param_lengths[c(
+        "maxCellsPerSamp",
+        "minCellsPerSamp"
+    )] > 0
+    cellsPerSampErr <- NULL
+    if (any(cellsPerSampIndicator) &
+        param_lengths["twoGroupDesign"] == 1) {
+        nsubjs <- ifelse(getRescueParam(object, "twoGroupDesign"),
+                         2 * getRescueParam(object, "nSubjsPerGroup"),
+                         getRescueParam(object, "nSubjsPerGroup")
         )
+
+        nsamps <- nsubjs * getRescueParam(object, "nTimepoints")
+
+        nconditions <- ifelse(getRescueParam(object, "twoGroupDesign"),
+                              2 * getRescueParam(object, "nTimepoints"),
+                              getRescueParam(object, "nTimepoints")
+        )
+
+        cellsPerSampIndicator <-
+            param_lengths[c("maxCellsPerSamp", "minCellsPerSamp")] %in%
+            c(1, nconditions, nsamps)
+        names(cellsPerSampIndicator) <- c("maxCellsPerSamp", "minCellsPerSamp")
+        if (any(!cellsPerSampIndicator)) {
+            cellsPerSampErr <-
+                vapply(
+                    names(cellsPerSampIndicator[!cellsPerSampIndicator]),
+                    function(x) {
+                        paste0(
+                            "Parameter ", x,
+                            " should contain a single value (",
+                            x, " for all samples), a vector with length equal to the number of conditions (group/timepoint combinations),or a vector with length equal to the number of total samples."
+                        )
+                    },
+                    character(1)
+                )
+        }
     }
-  }
-  return(cellsPerSampErr)
+    return(cellsPerSampErr)
 }
 
 
 .checkParamValues <- function(object, param_lengths) {
-  ## lt = parameters that can't be less than 0
-  ## lteq = parameters that can't be less than or equal to 0
-  paramsGT0 <- c(
-    logLibFacVar = "lt", logLibMean = "lteq",
-    logLibSD = "lt", customLibSizes = "lt",
-    exprsMean = "lteq",
-    dispersion = "lteq",
-    sampleFacVarSD = "lt",
-    subjectFacVarSD = "lt",
-    nSubjsPerGroup = "lteq",
-    nTimepoints = "lteq",
-    maxCellsPerSamp = "lteq",
-    minCellsPerSamp = "lteq",
-    propDE = "lt",
-    deLogFC = "lt"
-  )
-
-  LT0Indicator <- vapply(names(paramsGT0), function(x) {
-    if (param_lengths[x] != 0) {
-      ifelse(paramsGT0[x] == "lt", any(methods::slot(object, x) < 0),
-        any(methods::slot(object, x) < 0)
-      )
-    } else {
-      FALSE
-    }
-  }, logical(1))
-
-  if (any(LT0Indicator)) {
-    LT0Error <- vapply(
-      names(LT0Indicator[LT0Indicator]), function(x) {
-        lteq <- ifelse(paramsGT0[x] == "lt", "less than", "less than or equal to")
-        paste("Parameter", x, "should not contain values", lteq, "0")
-      },
-      character(1)
+    ## lt = parameters that can't be less than 0
+    ## lteq = parameters that can't be less than or equal to 0
+    paramsGT0 <- c(
+        logLibFacVar = "lt", logLibMean = "lteq",
+        logLibSD = "lt", customLibSizes = "lt",
+        exprsMean = "lteq",
+        dispersion = "lteq",
+        sampleFacVarSD = "lt",
+        subjectFacVarSD = "lt",
+        nSubjsPerGroup = "lteq",
+        nTimepoints = "lteq",
+        maxCellsPerSamp = "lteq",
+        minCellsPerSamp = "lteq",
+        propDE = "lt"
     )
-  } else {
-    LT0Error <- NULL
-  }
-  return(LT0Error)
+
+    LT0Indicator <- vapply(names(paramsGT0), function(x) {
+        if (param_lengths[x] != 0) {
+            ifelse(paramsGT0[x] == "lt", any(methods::slot(object, x) < 0),
+                   any(methods::slot(object, x) < 0)
+            )
+        } else {
+            FALSE
+        }
+    }, logical(1))
+
+    if (any(LT0Indicator)) {
+        LT0Error <- vapply(
+            names(LT0Indicator[LT0Indicator]), function(x) {
+                lteq <- ifelse(paramsGT0[x] == "lt", "less than", "less than or equal to")
+                paste("Parameter", x, "should not contain values", lteq, "0")
+            },
+            character(1)
+        )
+    } else {
+        LT0Error <- NULL
+    }
+    return(LT0Error)
 }
 
-.checkExprsDispLength <- function(param_lengths) {
-  if (param_lengths["exprsMean"] != param_lengths["dispersion"] &
-    (param_lengths["exprsMean"] != 0 | param_lengths["dispersion"] != 0)) {
-    exprsDispError <-
-      "Parameters exprsMean and dispersion must be vectors of equal length"
-  } else {
-    exprsDispError <- NULL
-  }
-  return(exprsDispError)
+.checkDeLogFCFormat <- function(deLogFC, nTimepoints, twoGroupDesign) {
+
+    # CASE 1: single value or numeric vector
+    if (is.numeric(deLogFC)) {
+        return(NULL)  # valid
+    }
+
+    # CASE 2: list of named vectors
+    # CASE 3: list of named numeric vectors
+    if (is.list(deLogFC)) {
+        if (length(nTimepoints) == 0 || length(twoGroupDesign) == 0) {
+            return("If deLogFC is a list, both nTimepoints and twoGroupDesign must be specified.")
+        }
+
+        if (nTimepoints == 1 && !twoGroupDesign) {
+            return("With only one timepoint and one group variable, DE cannot be defined.")
+        }
+
+        # Define expected and forbidden names
+        if (nTimepoints == 1 && twoGroupDesign) {
+            expected_names <- "group1"
+            forbidden_name <- "group0"
+        } else if (!twoGroupDesign) {
+            expected_names <- paste0("time", 1:(nTimepoints - 1))
+            forbidden_name <- "time0"
+        } else {
+            expected_names <- unlist(lapply(1:(nTimepoints - 1), function(t) {
+                paste0("time", t, "_group", 0:1)
+            }))
+            forbidden_name <- "time0_group0"
+        }
+
+        provided_names <- names(deLogFC)
+
+        if (is.null(provided_names)) {
+            return("If deLogFC is a list, all elements must be named.")
+        }
+
+        if (forbidden_name %in% provided_names) {
+            return(paste0("'", forbidden_name, "' should not be included in deLogFC; it is the reference level."))
+        }
+
+        # Check for unexpected or missing names
+        unexpected <- setdiff(provided_names, expected_names)
+        missing <- setdiff(expected_names, provided_names)
+
+        if (length(unexpected) > 0) {
+            return(paste("Unexpected names in deLogFC list:", paste(unexpected, collapse = ", ")))
+        }
+
+        if (length(missing) > 0) {
+            return(paste("Missing expected names in deLogFC list:", paste(missing, collapse = ", ")))
+        }
+
+        # Check all elements are numeric vectors
+        bad_type <- names(deLogFC)[!vapply(deLogFC, is.numeric, logical(1))]
+        if (length(bad_type) > 0) {
+            return(paste("The following elements of deLogFC are not numeric vectors:",
+                         paste(bad_type, collapse = ", ")))
+        }
+
+        return(NULL)
+    }
+
+    return("deLogFC must be NULL, a single numeric value, a numeric vector, or a named list of numeric vectors.")
+}
+
+.checkPropDEUpperBound <- function(propDE) {
+    if (propDE > 1) {
+        return("propDE must be less than or equal to 1.")
+    }
+    return(NULL)
 }
