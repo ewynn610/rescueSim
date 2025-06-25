@@ -1,6 +1,6 @@
 test_that(".setDE: scalar deLogFC, 1 group, 2 timepoints", {
     colDat <- data.frame(group = rep(0, 4), time = rep(c(0, 1), each = 2))
-    result <- .setDE(deLogFC = 1, propDE = 1, nGenes = 3, colDat = colDat)
+    result <- RESCUE:::.setDE(deLogFC = 1, propDE = 1, nGenes = 3, colDat = colDat)
 
     expect_equal(dim(result$de), c(3, 4))
     expect_true(all(result$de > 0))
@@ -12,7 +12,7 @@ test_that(".setDE: scalar deLogFC, 1 group, 2 timepoints", {
 test_that(".setDE: vector deLogFC, propDE < 1", {
     colDat <- data.frame(group = rep(0, 4), time = rep(c(0, 1), each = 2))
     set.seed(24)
-    result <- .setDE(deLogFC = c(-1, 1), propDE = 0.5, nGenes = 4, colDat = colDat)
+    result <- RESCUE:::.setDE(deLogFC = c(-1, 1), propDE = 0.5, nGenes = 4, colDat = colDat)
 
     expect_equal(dim(result$de), c(4, 4))
     expect_true(any(result$deFacs[[1]] == 0))
@@ -23,7 +23,7 @@ test_that(".setDE: list deLogFC, one timepoint, two groups", {
     colDat <- data.frame(group = rep(0:1, each = 2), time = rep(0, 4))
     custom_deLogFC <- list(group1 = c(1, 0, 0))
 
-    result <- .setDE(deLogFC = custom_deLogFC, propDE = numeric(0), nGenes = 3, colDat = colDat)
+    result <- RESCUE:::.setDE(deLogFC = custom_deLogFC, propDE = numeric(0), nGenes = 3, colDat = colDat)
 
     expect_equal(dim(result$de), c(3, 4))
     expect_equal(result$de[1, colDat$group == 1], rep(2, 2))
@@ -35,7 +35,7 @@ test_that(".setDE: list deLogFC, two timepoints, one group", {
     geneNames <- c("geneA", "geneB", "geneC")
     custom_deLogFC <- list(time1 = setNames(c(0, 1, 0), geneNames))
 
-    result <-.setDE(deLogFC = custom_deLogFC, propDE = numeric(0), nGenes = 3, colDat = colDat)
+    result <-RESCUE:::.setDE(deLogFC = custom_deLogFC, propDE = numeric(0), nGenes = 3, colDat = colDat)
 
     expect_equal(dim(result$de), c(3, 4))
     expect_equal(result$de[2, colDat$time == 1], rep(2, 2))
@@ -51,7 +51,7 @@ test_that(".setDE: list deLogFC, two timepoints and two groups", {
         time0_group1 = setNames(c(0, 0, 1), geneNames)
     )
 
-    result <- .setDE(deLogFC = custom_deLogFC, propDE = numeric(0), nGenes = 3, colDat = colDat)
+    result <- RESCUE:::.setDE(deLogFC = custom_deLogFC, propDE = numeric(0), nGenes = 3, colDat = colDat)
     colNames <- paste0("time", colDat$time, "_group", colDat$group)
 
     expect_equal(result$de[1, colNames == "time1_group0"], rep(2, sum(colNames == "time1_group0")))
@@ -61,7 +61,7 @@ test_that(".setDE: list deLogFC, two timepoints and two groups", {
 
 test_that(".setDE: returns all 1s if propDE = 0", {
     colDat <- data.frame(group = rep(0, 4), time = rep(c(0, 1), each = 2))
-    result <-.setDE(deLogFC = 1, propDE = 0, nGenes = 3, colDat = colDat)
+    result <-RESCUE:::.setDE(deLogFC = 1, propDE = 0, nGenes = 3, colDat = colDat)
 
     expect_true(all(result$de == 1))
     expect_true(all(result$deFacs[[1]] == 0))
@@ -82,7 +82,7 @@ test_that(".setDE: list deLogFC, 3 timepoints, 1 group", {
         time2 = setNames(c(0, 1, 0), geneNames)   # geneB upregulated at time2
     )
 
-    result <- .setDE(
+    result <- RESCUE:::.setDE(
         deLogFC = custom_deLogFC,
         propDE = numeric(0),
         nGenes = 3,
@@ -105,7 +105,7 @@ test_that(".setDE: numeric deLogFC gives linear change over 3 timepoints, 1 grou
         time = rep(0:2, each = 2)
     )
 
-    result <- .setDE(deLogFC = 1, propDE = 1, nGenes = 1, colDat = colDat)
+    result <- RESCUE:::.setDE(deLogFC = 1, propDE = 1, nGenes = 1, colDat = colDat)
 
     # Reverse-engineer the design factor:
     # For group=0, function internally adds 1, so group=1
@@ -128,7 +128,7 @@ test_that(".setDE: numeric deLogFC gives linear interaction over 3 timepoints, 2
     )
     colDat <- colDat[rep(1:nrow(colDat), each = 2), ]  # 2 replicates per condition
 
-    result <- .setDE(deLogFC = 1, propDE = 1, nGenes = 1, colDat = colDat)
+    result <- RESCUE:::.setDE(deLogFC = 1, propDE = 1, nGenes = 1, colDat = colDat)
 
     # Design factor is (time / 2) * group
     expected_logFC <- outer(0:2, 0:1, function(t, g) (t / 2) * g)*-1

@@ -453,8 +453,10 @@ setValidity("RescueParams", rescueParamsValidity)
 }
 
 .checkPropDEUpperBound <- function(propDE) {
-    if (propDE > 1) {
+    if(length(propDE)==1){
+    if (propDE > 1 ) {
         return("propDE must be less than or equal to 1.")
+    }
     }
     return(NULL)
 }
