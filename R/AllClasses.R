@@ -421,3 +421,27 @@ setValidity("RescueParams", rescueParamsValidity)
     }
     return(NULL)
 }
+
+.checkGeneParamLengths <- function(param_lengths, deLogFC) {
+    errors <- character()
+
+    # Check exprsMean and dispersion lengths
+    if (param_lengths["exprsMean"] != param_lengths["dispersion"] &&
+        (param_lengths["exprsMean"] != 0 || param_lengths["dispersion"] != 0)) {
+        errors <- c(errors, "Parameters exprsMean and dispersion must be vectors of equal length")
+    }
+
+    # Check deLogFC list element lengths (if it's a list)
+    if (is.list(deLogFC)) {
+        bad_lengths <- vapply(deLogFC, function(x) length(x) != param_lengths["exprsMean"], logical(1))
+        if (any(bad_lengths)) {
+            bad_keys <- names(deLogFC)[bad_lengths]
+            msg <- paste0("logFC vectors for the following keys do not match length of exprsMean: ",
+                          paste(bad_keys, collapse = ", "))
+            errors <- c(errors, msg)
+        }
+    }
+
+    if (length(errors) == 0) return(NULL)
+    return(paste(errors, collapse = "\n"))
+}
