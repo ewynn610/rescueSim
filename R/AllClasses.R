@@ -67,10 +67,47 @@
 #' @slot propDE Proportion of genes differentially expressed between
 #' timepoints/groups. Must be a numeric value between 0 and 1.
 #' @slot deLogFC Fold change values used for differentially expressed genes.
-#' A single numeric value >=0 indicating the positive log-fold change for
-#' differentially expressed genes (log2 fold change values will be simulated
-#' evenly to be positive or negative) or a vector of values (positive of
-#' negative) to draw log2 fold change values from.
+#'
+#' Specifies the log2 fold changes for differentially expressed (DE) genes.
+#' All values are interpreted as relative to a common baseline condition:
+#' \strong{time0 and/or group0}.
+#'
+#' Acceptable formats include:
+#' \itemize{
+#'   \item A single numeric value \code{>= 0}, indicating the absolute log2 fold
+#'    change between baseline and the final condition. Log2 fold changes will be
+#'     randomly assigned as positive or negative across DE genes.
+#'
+#'   \item A numeric vector of possible log2 fold change values (positive and/or
+#'    negative) from which values will be randomly drawn for DE genes.
+#'
+#'   \item A named list of numeric vectors specifying gene-specific log2 fold
+#'   changes for each experimental condition, relative to the baseline
+#'   (\code{"time0"}, \code{"group0"}, or \code{"time0_group0"}
+#'   depending on design). Each vector must have length equal to the number of
+#'   genes. Valid names for list elements depend on the experimental design:
+#'   \itemize{
+#'     \item For single-group, multi-timepoint designs: \code{"time1"},
+#'     \code{"time2"}, etc.
+#'     \item For two-group, single-timepoint designs: \code{"group1"}
+#'     \item For multi-timepoint, two-group designs: \code{"time1_group0"},
+#'     \code{"time1_group1"}, etc.
+#'   }
+#'   The reference condition — \code{"time0"}, \code{"group0"}, or
+#'   \code{"time0_group0"} — must \strong{not} be included in the list, as it is
+#'    implicitly treated as having log2FC = 0.
+#' }
+#'
+#' When a single value or vector is provided (i.e., not a list), log2 fold
+#' changes are applied in a structured way:
+#' \itemize{
+#'   \item For two-group, two-timepoint designs: group 0 shows no change over
+#'   time, while group 1 exhibits a linear change over time from 0 to the
+#'   specified log2FC.
+#'   \item For designs with more than two timepoints: a linear trajectory is
+#'   simulated, and the log2FC value represents the total change from time 0 to
+#'   the final timepoint.
+#' }
 #'
 #' @author Elizabeth Wynn
 #'
