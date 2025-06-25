@@ -18,14 +18,16 @@
 #'             \item{group}{Group identifier}
 #'         }
 #'     }
-#'     \item{\code{rowData}}{
-#'         \describe{
-#'             \item{deLogFC}{Log2 fold change between first and last timepoints
-#'             or groups, or, if multi-timepoint and multi-group data, Log2 fold
-#'              change between the last timepoint and group vs. other
-#'              timepoint/group combinations}
-#'         }
-#'     }
+#' \item{\code{rowData}}{
+#'   \describe{
+#'     \item{deLogFC}{A \code{DataFrame} containing log2 fold change information for each gene.
+#'     Each column corresponds to a non-reference experimental condition
+#'     (e.g., \code{"time1"}, \code{"group1"}, \code{"time1_group1"}, etc.), and values represent
+#'     gene-level log2 fold changes relative to the baseline condition
+#'     (\code{"time0"}, \code{"group0"}, or \code{"time0_group0"} depending on the design).
+#'     The reference condition itself is not included as a column.}
+#'   }
+#' }
 #'
 #' }
 #'
