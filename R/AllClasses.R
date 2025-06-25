@@ -436,7 +436,7 @@ setValidity("RescueParams", rescueParamsValidity)
         bad_lengths <- vapply(deLogFC, function(x) length(x) != param_lengths["exprsMean"], logical(1))
         if (any(bad_lengths)) {
             bad_keys <- names(deLogFC)[bad_lengths]
-            msg <- paste0("logFC vectors for the following keys do not match length of exprsMean: ",
+            msg <- paste0("The lengths of the following logFC vectors do not match exprsMean: ",
                           paste(bad_keys, collapse = ", "))
             errors <- c(errors, msg)
         }
