@@ -80,7 +80,8 @@ simRescueData <- function(paramObj) {
         getRescueParam(paramObj, "sampleFacVarMean"),
         getRescueParam(paramObj, "sampleFacVarSD"),
         getRescueParam(paramObj, "subjectFacVarMean"),
-        getRescueParam(paramObj, "subjectFacVarSD")
+        getRescueParam(paramObj, "subjectFacVarSD"),
+        nTimepoints=getRescueParam(paramObj, "nTimepoints")
     )
 
     dir_batch <- .drawBatchFacs(
@@ -91,10 +92,10 @@ simRescueData <- function(paramObj) {
 
 
     de <- .setDE(
-        getRescueParam(paramObj, "deLogFC"),
-        getRescueParam(paramObj, "propDE"),
-        nGenes,
-        colDat
+        deLogFC =getRescueParam(paramObj, "deLogFC"),
+        propDE = getRescueParam(paramObj, "propDE"),
+        nGenes = nGenes,
+        colDat = colDat
     )
 
     ## Simulate True Expression values
@@ -111,7 +112,9 @@ simRescueData <- function(paramObj) {
     colDat$group <- paste0("group", colDat$group)
     rownames(colDat) <- paste0("cell", seq_len(nrow(colDat)))
 
-    rowDat <- data.frame(deLogFC = de$deFac, row.names = rownames(counts))
+    if(!is.null(de$deFacs)){
+        rowDat <- data.frame(deLogFC = de$deFacs, row.names = rownames(counts))
+    }else rowDat=NULL
 
 
     rownames(colDat) <- colnames(counts)
@@ -229,8 +232,12 @@ simRescueData <- function(paramObj) {
 
 .drawBatchVars <- function(n_genes,
                            sampleFacVarMean, sampleFacVarSD,
-                           subjectFacVarMean, subjectFacVarSD) {
-    samp_var <- stats::rlnorm(n_genes, sampleFacVarMean, sampleFacVarSD)
+                           subjectFacVarMean, subjectFacVarSD, nTimepoints) {
+    if(nTimepoints==1){
+        samp_var=NA
+    }else{
+        samp_var <- stats::rlnorm(n_genes, sampleFacVarMean, sampleFacVarSD)
+    }
     subj_var <- stats::rlnorm(n_genes, subjectFacVarMean, subjectFacVarSD)
     ret <- data.frame(samp_var = samp_var, subj_var = subj_var)
 }
@@ -251,11 +258,7 @@ simRescueData <- function(paramObj) {
                          FUN.VALUE = numeric(1)
     )
     alpha_subj <- ifelse(alpha_subj <= 0, min(alpha_subj[alpha_subj > 0]), alpha_subj)
-    alpha_samp <- vapply(batchVars$samp_var, .calcAlpha,
-                         n = nTimepoints,
-                         FUN.VALUE = numeric(1)
-    )
-    alpha_samp <- ifelse(alpha_samp <= 0, min(alpha_samp[alpha_samp > 0]), alpha_samp)
+
     a <- vapply(alpha_subj, function(alpha) {
         x <- gtools::rdirichlet(1, rep(alpha, n_subjs)) * n_subjs
         if (any(is.na(x))) {
@@ -266,23 +269,36 @@ simRescueData <- function(paramObj) {
         return(x)
     }, FUN.VALUE = numeric(n_subjs))
 
-    b <- matrix(nrow = length(alpha_samp), ncol = nrow(samp_subj_df))
-    colnames(b) <- samp_subj_df$sampleID
-    for (i in seq_len(length(unique(subjectID)))) {
-        subject <- unique(subjectID)[i]
-        subj_sampleID <- samp_subj_df$sampleID[samp_subj_df$subjectID == subject]
-        nSampsPerSubj <- length(subj_sampleID)
-        b_temp <- vapply(alpha_samp, function(alpha) {
-            x <- gtools::rdirichlet(1, rep(alpha, nSampsPerSubj)) * nSampsPerSubj
-            if (any(is.na(x))) {
-                x <- rep(0, nSubjsPerGroup)
-                x[sample(seq_len(nSubjsPerGroup), 1)] <- 1
-                x <- x * nSubjsPerGroup
-            }
-            return(x)
-        }, FUN.VALUE = numeric(nSampsPerSubj))
-        b[, subj_sampleID] <- t(b_temp)
+    ## If only one timepoint, then all values of b should be 1
+    if(nTimepoints==1){
+        b <- matrix(1,nrow = nrow(batchVars), ncol = nrow(samp_subj_df))
+        colnames(b) <- samp_subj_df$sampleID
+    }else{
+        alpha_samp <- vapply(batchVars$samp_var, .calcAlpha,
+                             n = nTimepoints,
+                             FUN.VALUE = numeric(1)
+        )
+        alpha_samp <- ifelse(alpha_samp <= 0, min(alpha_samp[alpha_samp > 0]), alpha_samp)
+
+        b <- matrix(nrow = length(alpha_samp), ncol = nrow(samp_subj_df))
+        colnames(b) <- samp_subj_df$sampleID
+        for (i in seq_len(length(unique(subjectID)))) {
+            subject <- unique(subjectID)[i]
+            subj_sampleID <- samp_subj_df$sampleID[samp_subj_df$subjectID == subject]
+            nSampsPerSubj <- length(subj_sampleID)
+            b_temp <- vapply(alpha_samp, function(alpha) {
+                x <- gtools::rdirichlet(1, rep(alpha, nSampsPerSubj)) * nSampsPerSubj
+                if (any(is.na(x))) {
+                    x <- rep(0, nSubjsPerGroup)
+                    x[sample(seq_len(nSubjsPerGroup), 1)] <- 1
+                    x <- x * nSubjsPerGroup
+                }
+                return(x)
+            }, FUN.VALUE = numeric(nSampsPerSubj))
+            b[, subj_sampleID] <- t(b_temp)
+        }
     }
+
 
 
 
@@ -301,39 +317,74 @@ simRescueData <- function(paramObj) {
 }
 
 .setDE <- function(deLogFC, propDE, nGenes, colDat) {
-
     time <- colDat$time
     group <- colDat$group
     nGroups <- length(unique(group))
     nTimepoints <- length(unique(time))
     nCells <- nrow(colDat)
 
-
     # CASE 1: Numeric input (scalar or vector)
     if (is.numeric(deLogFC)) {
-        if (nGroups == 1) group <- group + 1
-        if (nTimepoints == 1) {
-            time <- time + 1
-            nTimepoints <- 2
+
+        # Handle case where there's no DE to model
+        if (nTimepoints == 1 && nGroups == 1) {
+            warning("No differential expression modeled: only one timepoint and one group provided.")
+            de <- matrix(1, nrow = nGenes, ncol = nCells)
+            return(list(de = de, deFacs = NULL))
         }
 
+        if (nGroups == 1) group <- group + 1
+        if (nTimepoints == 1) time <- time + 1
+
+        # For design factor scaling
+        denom <- max(nTimepoints - 1, 1)
+        design_factor <- (time / denom) * group
+
+        # Sample DE genes
         de_genes <- sample(c(TRUE, FALSE), nGenes,
                            replace = TRUE,
                            prob = c(propDE, 1 - propDE))
 
+        # Symmetric logFCs if scalar
         if (length(deLogFC) == 1) {
             deLogFC <- c(-deLogFC, deLogFC)
         }
 
+        # Assign logFCs to DE genes
         de_facs <- rep(0, nGenes)
         de_facs[de_genes] <- sample(deLogFC, sum(de_genes), replace = TRUE)
 
-        design_factor <- (time / (nTimepoints - 1)) * group
-        de <- matrix(design_factor, nrow = nGenes, ncol = nCells, byrow = TRUE)
-        de <- de * de_facs
-        de <- 2^de
+        de_log <- matrix(design_factor, nrow = nGenes, ncol = nCells, byrow = TRUE)
+        de_log <- de_log * de_facs
 
-        return(list(de = de, deFacs = de_facs))
+        # Generate condition names
+        colNames <- character(nCells)
+        if (nTimepoints == 1 && nGroups == 2) {
+            colNames <- paste0("group", group)
+            condition_names <- "group1"
+        } else if (nGroups == 1 && nTimepoints > 1) {
+            colNames <- paste0("time", time)
+            condition_names <- paste0("time", 1:(nTimepoints - 1))
+        } else {
+            colNames <- paste0("time", time, "_group", group)
+            condition_names <- unlist(lapply(1:(nTimepoints - 1), function(t) {
+                paste0("time", t, "_group", 0:1)
+            }))
+        }
+
+        # Build deLogFC list
+        deLogFC_list <- lapply(condition_names, function(cname) {
+            idx <- which(colNames == cname)
+            if (length(idx) == 0) {
+                rep(0, nGenes)
+            } else {
+                rowMeans(de_log[, idx, drop = FALSE])
+            }
+        })
+        names(deLogFC_list) <- condition_names
+
+        de <- 2^de_log
+        return(list(de = de, deFacs = deLogFC_list))
     }
 
     # CASE 2: List of vectors with gene-specific logFCs
@@ -350,8 +401,6 @@ simRescueData <- function(paramObj) {
 
         # Build DE matrix from log2FCs
         de_log <- matrix(0, nrow = nGenes, ncol = nCells)
-
-        ## Add in de for each condition
         for (cond_name in names(deLogFC)) {
             de_log[, colNames == cond_name] <- deLogFC[[cond_name]]
         }
@@ -360,6 +409,7 @@ simRescueData <- function(paramObj) {
         return(list(de = de, deFacs = deLogFC))
     }
 
+    stop("Invalid format for deLogFC.")
 }
 
 
