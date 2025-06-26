@@ -1,7 +1,7 @@
-# RESCUE: Repeated measures single cell RNA-sequencing data simulation
+# rescueSim: Repeated measures single cell RNA-sequencing data simulation
 ## Getting started 
 
-RESCUE is a package for simulating repeated measures scRNA-Seq data. To install the package, start by ensuring all dependencie sare installed:
+rescueSim is a package for simulating repeated measures scRNA-Seq data. To install the package, start by ensuring all dependencie sare installed:
 ```{r}
 ## Install CRAN dependencies
 install.packages(c("checkmate", "dplyr", "gtools", "Matrix"))
@@ -15,15 +15,15 @@ BiocManager::install(c("scater", "edgeR", "scran", "scater", "scuttle", "SingleC
 
 ```
 
-The RESCUE package can be installed from github using the following code:
+The rescueSim package can be installed from github using the following code:
 ```{r}
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
-devtools::install_github("https://github.com/ewynn610/Rescue",  build_vignettes = T)
+devtools::install_github("https://github.com/ewynn610/rescueSim",  build_vignettes = T)
 ```
 
 Once the package is installed, to access a vignette introducing the package workflow use:
 ```{r}
-vignette("rescueVignette")
+vignette("rescueSimVignette")
 ```
