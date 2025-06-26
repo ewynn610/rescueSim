@@ -1,7 +1,7 @@
 
 #' Example RNA-Seq data from paired observations
 #'
-#' Sample \code{\link{RescueParams}} object with
+#' Sample \code{\link{RescueSimParams}} object with
 #' gene expression data for recruited airspace macrophage cells from
 #' bronchoalveolar lavage samples samples collected from healthy adults.
 #' The dataset from which parameters were estimated had 19,410 genes and 9,041
@@ -9,7 +9,7 @@
 #' subject.
 #'
 #'
-#' @format \code{\link{RescueParams}} object with parameters estimated from
+#' @format \code{\link{RescueSimParams}} object with parameters estimated from
 #' empirical dataset
 #' @usage data(RecAM_params)
 #'

@@ -1,14 +1,14 @@
 ---
-title: "RESCUE: REpeated measures Single Cell RNA-seqUEncing data simulation"
+title: "rescueSim: REpeated measures Single Cell RNA-seqUEncing data simulation"
 output:
   html_document:
     toc: true
     toc_float: true
     theme: united
     df_print: kable
-date: 'Compiled: `r format(Sys.Date(), "%B %d, %Y")`'
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
 vignette: >
-  %\VignetteIndexEntry{rescueVignette}
+  %\VignetteIndexEntry{rescueSimVignette}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -27,14 +27,14 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-RESCUE is an R package for simulating single-cell RNA-sequencing
+rescueSim is an R package for simulating single-cell RNA-sequencing
 (scRNA-seq) data from repeated measures designs, such as longitudinal
 studies. One benefit of these types of studies is they allow researchers
 to investigate changes in gene expression over time for a specific cell
 type. Realistic simulated data data can be used to evaluate analysis
 methods and assess power under a variety of settings.
 
-The RESCUE package uses a gamma-poisson framework to simulate data from
+The rescueSim package uses a gamma-poisson framework to simulate data from
 individual cell-types while mimicking important attributes of empirical
 data, between-sample variability (i.e. data from cells from the same
 sample are correlated) and between-subject variability (i.e. data from
@@ -53,7 +53,7 @@ In this vignette, we outline:
 
 # Installation
 
-RESCUE is available on github at: <https://github.com/ewynn610/RESCUE>.
+rescueSim is available on github at: <https://github.com/ewynn610/rescueSim>.
 
 It can be installed using:
 
@@ -61,12 +61,12 @@ It can be installed using:
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
-devtools::install_github("https://github.com/ewynn610/RESCUE")
+devtools::install_github("https://github.com/ewynn610/rescueSim")
 ```
 
 # Simulation Overview
 
-RESCUE simulates a data set for a *single* cell type with gene
+rescueSim simulates a data set for a *single* cell type with gene
 expression counts for cells from several samples, with multiple samples
 coming from individual subjects. If a user wants data from several cell
 types, this process can be repeated to generate data for each cell type
@@ -100,8 +100,8 @@ data.
 
 The simulation workflow includes two broad steps:
 
-1.  Generating simulation parameters (using `RescueParams()` and
-    `estimateRescueParams()`)
+1.  Generating simulation parameters (using `RescueSimParams()` and
+    `estimateRescueSimParams()`)
 2.  Using the simulation parameters to simulate the data (using
     `simulateRescueData()`)
 
@@ -118,7 +118,7 @@ collected from five subjects at two timepoints per subject.
 
 ```{r}
 ## Load neccessary packages
-library(RESCUE)
+library(rescueSim)
 library(SingleCellExperiment)
 
 ## set seed for reproducibility
@@ -156,13 +156,13 @@ RecAM_sce_small <- RecAM_sce[1:40, ]
 
 # Generating simulation parameters
 
-Objects of the class `RescueParams` are used to hold simulation
+Objects of the class `RescueSimParams` are used to hold simulation
 parameters and settings. A parameter object can be generated using the
 code below.
 
 ```{r}
 ## Create params object
-myParams <- RescueParams()
+myParams <- RescueSimParams()
 
 ## Param object class
 class(myParams)
@@ -197,48 +197,48 @@ The table below gives an details about the simulation parameters.
 |      `propDE`      |                \-                |                                                                     Proportion of genes differentially expressed between timepoints/groups.                                                                      |                                                                                                                                                                   Numeric value between 0 and 1.                                                                                                                                                                   |
 |     `deLogFC`      |                \-                |                                                                           Fold change values used for differentially expressed genes.                                                                            |                                           A single numeric value \>=0 indicating the positive log-fold change for differentially expressed genes (log$_2$ fold change values will be simulated evenly to be positive or negative) or a vector of values (positive of negative) to draw log$_2$ fold change values from.                                            |
 
-Individual parameter values can be extracted using the `getRescueParam`
+Individual parameter values can be extracted using the `getRescueSimParam`
 function.
 
 ```{r}
 ## Extract nTimepoints parameter
-getRescueParam(myParams, "nTimepoints")
+getRescueSimParam(myParams, "nTimepoints")
 ```
 
 ### Manually adding parameter values
 
 Parameter values can be added manually when initially creating the
 parameter object by using the parameter name(s) as an argument in the
-`RescueParams` function followed by the desired value(s).
+`RescueSimParams` function followed by the desired value(s).
 
 ```{r}
 ## Create parameter object with nTimepoints and nSubjsPerGroup pre-set
-myParams <- RescueParams(nTimepoints = 2, nSubjsPerGroup = 5)
-getRescueParam(myParams, "nTimepoints")
-getRescueParam(myParams, "nSubjsPerGroup")
+myParams <- RescueSimParams(nTimepoints = 2, nSubjsPerGroup = 5)
+getRescueSimParam(myParams, "nTimepoints")
+getRescueSimParam(myParams, "nSubjsPerGroup")
 ```
 
 After a parameter object is created, the values can be updated using
-`updateRescueParams` with the parameter object and then a list of
+`updateRescueSimParams` with the parameter object and then a list of
 parameters and associated values.
 
 ```{r}
 ## Update nTimepoints and nSubjsPerGroup
-myParams <- updateRescueParams(
+myParams <- updateRescueSimParams(
   paramObj = myParams,
   paramValues = list(
     nTimepoints = 3,
     nSubjsPerGroup = 10
   )
 )
-getRescueParam(myParams, "nTimepoints")
-getRescueParam(myParams, "nSubjsPerGroup")
+getRescueSimParam(myParams, "nTimepoints")
+getRescueSimParam(myParams, "nSubjsPerGroup")
 ```
 
 ### Estimating parameter values from empirical data
 
 Parameters can be estimated from empirical datasets using the
-`estRescueParams` function. Users provide a dataset in the form of a
+`estRescueSimParams` function. Users provide a dataset in the form of a
 `SingleCellExperiment` object with a counts matrix in the `counts` slot
 and sample, subject, timepoint, and group meta data (where applicable)
 in `colData`. The table below outlines other function arguments.
@@ -246,7 +246,7 @@ in `colData`. The table below outlines other function arguments.
 |        Argument         | Description                                                                                                                                                                                                                                                                                             | Default |
 |:-----------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
 |          `sce`          | `SingleCellExperiment` object containing empirical data with a counts matrix in the `counts` slot.                                                                                                                                                                                                      |   \-    |
-|       `paramObj`        | `RescueParams` object with empty slots for parameters which need to be estimated. If `NULL`, all parameter values will be estimated.                                                                                                                                                                    | `NULL`  |
+|       `paramObj`        | `RescueSimParams` object with empty slots for parameters which need to be estimated. If `NULL`, all parameter values will be estimated.                                                                                                                                                                    | `NULL`  |
 |    `sampleVariable`     | String denoting name of sample identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, data is assumed to contain only one sample parameters `logLibFacVar`, `sampleFacVarMean`, `sampleFacVarSD`, `subjectFacVarMean`, and `subjectFacVarSD` parameters cannot be estimated. | `NULL`  |
 |    `subjectVariable`    | String denoting name of subject identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, parameters `nSubjsPerGroup`, `subjectFacVarMean`, and `subjectFacVarSD` parameters cannot be estimated.                                                                               | `NULL`  |
 |   `timepointVariable`   | String denoting name of timepoint identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, the number of timepoints for the simulated data is set to 2.                                                                                                                        | `NULL`  |
@@ -270,7 +270,7 @@ such as `edgeR` or `DESeq2` and the invariant genes can be passed to the
 
 ```{r}
 ## Estimate all parameters from the data
-myParams_estimated <- estRescueParams(
+myParams_estimated <- estRescueSimParams(
   sce = RecAM_sce_small, paramObj = NULL,
   sampleVariable = "sampleID",
   subjectVariable = "subjectID",
@@ -283,9 +283,9 @@ myParams_estimated
 ```
 
 If you want to manually set some parameters before estimating others, a
-`RescueParams` object with blank slots for the parameters you would like
+`RescueSimParams` object with blank slots for the parameters you would like
 estimated can be provided. Any parameters that already have values in
-the `RescueParams` object will not be estimated. This is particularly
+the `RescueSimParams` object will not be estimated. This is particularly
 useful if using single-sample or single-timepoint empirical data. Below
 is an example of how data can be simulated using single-timepoint
 empirical data after manually setting some parameters.
@@ -295,10 +295,10 @@ empirical data after manually setting some parameters.
 RecAM_sce_single_time <- RecAM_sce_small[, RecAM_sce_small$time == "time0"]
 
 ## Create a params object with necessary parameters filled
-myParams <- RescueParams(subjectFacVarMean = -4, subjectFacVarSD = 1, nSubjsPerGroup = 5)
+myParams <- RescueSimParams(subjectFacVarMean = -4, subjectFacVarSD = 1, nSubjsPerGroup = 5)
 
 ## Estimate remaining parameters from the data
-myParams_estimated <- estRescueParams(
+myParams_estimated <- estRescueSimParams(
   sce = RecAM_sce_single_time,
   paramObj = myParams,
   sampleVariable = "sampleID"
@@ -306,7 +306,7 @@ myParams_estimated <- estRescueParams(
 ```
 
 All of the parameters are estimated from the data except for the
-parameters that we specified when creating the `RescueParams` object.
+parameters that we specified when creating the `RescueSimParams` object.
 
 ```{r}
 myParams_estimated
@@ -316,15 +316,15 @@ If `propDE` and `deLogFC` are not manually set, they are both set to 0
 (no differential expression).
 
 ```{r}
-getRescueParam(myParams_estimated, "propDE")
-getRescueParam(myParams_estimated, "deLogFC")
+getRescueSimParam(myParams_estimated, "propDE")
+getRescueSimParam(myParams_estimated, "deLogFC")
 ```
 
 # Simulating Data
 
 After setting simulation parameters, the `simRescueData` function can be
 used to simulate a dataset. This function takes as an argument a
-`RescueParams` object. It returns a `SingleCellExperiment`.
+`RescueSimParams` object. It returns a `SingleCellExperiment`.
 
 ```{r}
 ## Simulate data
@@ -364,7 +364,7 @@ remainder of the document.
 
 ```{r}
 ## Estimate parameters using full RecAM_sce object
-myParams <- estRescueParams(RecAM_sce,
+myParams <- estRescueSimParams(RecAM_sce,
   sampleVariable = "sampleID",
   subjectVariable = "subjectID",
   timepointVariable = "time",
@@ -378,7 +378,7 @@ myParams <- estRescueParams(RecAM_sce,
 A question likely to arise in repeated measures scRNA-seq analysis and
 study planning is how the sample size will impact results. In these
 experiments, there are different aspects of sample size, all of which
-can be controlled in using the `RESCUE` simulation method:
+can be controlled in using the `rescueSim` simulation method:
 
 -   Number of timepoints (samples) per subject (`nTimepoints`)
 
@@ -402,7 +402,7 @@ A user can estimate individual parameters for each condition by using
 
 ```{r}
 ## Set cell parameter values to numeric 0 so we can re-estimate
-myParams_cellsByCondition <- updateRescueParams(
+myParams_cellsByCondition <- updateRescueSimParams(
   myParams,
   list(
     maxCellsPerSamp = numeric(0),
@@ -410,7 +410,7 @@ myParams_cellsByCondition <- updateRescueParams(
   )
 )
 ## Estimate with cellParamsByCondition = T
-myParams_cellsByCondition <- estRescueParams(RecAM_sce,
+myParams_cellsByCondition <- estRescueSimParams(RecAM_sce,
   myParams_cellsByCondition,
   sampleVariable = "sampleID",
   subjectVariable = "subjectID",
@@ -419,8 +419,8 @@ myParams_cellsByCondition <- estRescueParams(RecAM_sce,
 )
 
 ## Now cell parameters are estimated separately by timepoint
-getRescueParam(myParams_cellsByCondition, "maxCellsPerSamp")
-getRescueParam(myParams_cellsByCondition, "minCellsPerSamp")
+getRescueSimParam(myParams_cellsByCondition, "maxCellsPerSamp")
+getRescueSimParam(myParams_cellsByCondition, "minCellsPerSamp")
 ```
 
 Alternatively, a user can manually set the parameters with vector values
@@ -428,7 +428,7 @@ equal to the number of conditions.
 
 ```{r}
 ## Manually setting parameters
-myParams_cellsByCondition <- updateRescueParams(
+myParams_cellsByCondition <- updateRescueSimParams(
   myParams,
   list(
     maxCellsPerSamp = c(100, 500),
@@ -460,9 +460,9 @@ value for `logLibMean`.
 
 ```{r}
 ## Create two parameter objects, one with large logLibMean, one with small logLibMean
-myParams_bigLogLibMean <- updateRescueParams(myParams, list(logLibMean = log(5000)))
+myParams_bigLogLibMean <- updateRescueSimParams(myParams, list(logLibMean = log(5000)))
 
-myParams_smallLogLibMean <- updateRescueParams(myParams, list(logLibMean = log(500)))
+myParams_smallLogLibMean <- updateRescueSimParams(myParams, list(logLibMean = log(500)))
 
 ## Simulate data with both scenarios
 simDat_bigLogLibMean <- simRescueData(myParams_bigLogLibMean)
@@ -490,9 +490,9 @@ small value for `logLibSD`.
 
 ```{r}
 ## Create two parameter objects, one with large logLibSD, one with small logLibSD
-myParams_bigLogLibSD <- updateRescueParams(myParams, list(logLibSD = log(2)))
+myParams_bigLogLibSD <- updateRescueSimParams(myParams, list(logLibSD = log(2)))
 
-myParams_smallLogLibSD <- updateRescueParams(myParams, list(logLibSD = log(1.25)))
+myParams_smallLogLibSD <- updateRescueSimParams(myParams, list(logLibSD = log(1.25)))
 
 ## Simulate data with both scenarios
 simDat_bigLogLibSD <- simRescueData(myParams_bigLogLibSD)
@@ -530,9 +530,9 @@ affects the library size distribution by sample.
 
 ```{r}
 ## Create two parameter objects, one with large logLibFacVar, one with small logLibFacVar
-myParams_smalllogLibFacVar <- updateRescueParams(myParams, list(logLibFacVar = 0))
+myParams_smalllogLibFacVar <- updateRescueSimParams(myParams, list(logLibFacVar = 0))
 
-myParams_biglogLibFacVar <- updateRescueParams(myParams, list(logLibFacVar = .005))
+myParams_biglogLibFacVar <- updateRescueSimParams(myParams, list(logLibFacVar = .005))
 
 
 
@@ -567,7 +567,7 @@ boxplot(log(libSizes) ~ sample,
 
 ## Between Subject/Sample Variation
 
-To simulate between-sample and between-subject variation, `RESCUE` uses
+To simulate between-sample and between-subject variation, `rescueSim` uses
 gene specific sample- and subject- level multiplicative factors which
 are multiplied with the mean gene expression for each gene, with the
 resulting value being used later in simulation (see Figure 1, step 1).
@@ -595,7 +595,7 @@ samples don't cluster together
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Set sampleFacVarMean to -10
-myParams_smallsampleFacVarMean <- updateRescueParams(myParams, list(sampleFacVarMean = -10))
+myParams_smallsampleFacVarMean <- updateRescueSimParams(myParams, list(sampleFacVarMean = -10))
 
 ## Simulate data
 simDat_smallsampleFacVarMean <- simRescueData(myParams_smallsampleFacVarMean)
@@ -614,7 +614,7 @@ sample.
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Set sampleFacVarMean to -3
-myParams_bigsampleFacVarMean <- updateRescueParams(myParams, list(sampleFacVarMean = -3))
+myParams_bigsampleFacVarMean <- updateRescueSimParams(myParams, list(sampleFacVarMean = -3))
 
 ## Simulate data
 simDat_bigsampleFacVarMean <- simRescueData(myParams_bigsampleFacVarMean)
@@ -633,7 +633,7 @@ The same is true if we look at the effect of increasing the
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Set subjectFacVarMean to -3
-myParams_smallsubjectFacVarMean <- updateRescueParams(myParams, list(subjectFacVarMean = -10))
+myParams_smallsubjectFacVarMean <- updateRescueSimParams(myParams, list(subjectFacVarMean = -10))
 
 ## Simulate data
 simDat_smallsubjectFacVarMean <- simRescueData(myParams_smallsubjectFacVarMean)
@@ -649,7 +649,7 @@ scater::plotTSNE(simDat_smallsubjectFacVarMean, colour_by = "subjectID")
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Set subjectFacVarMean to -3
-myParams_bigsubjectFacVarMean <- updateRescueParams(myParams, list(subjectFacVarMean = -3))
+myParams_bigsubjectFacVarMean <- updateRescueSimParams(myParams, list(subjectFacVarMean = -3))
 
 ## Simulate data
 simDat_bigsubjectFacVarMean <- simRescueData(myParams_bigsubjectFacVarMean)
@@ -665,7 +665,7 @@ scater::plotTSNE(simDat_bigsubjectFacVarMean, colour_by = "subjectID")
 
 ## Differential Expression
 
-`RESCUE` allows the user to simulate differential expression between
+`rescueSim` allows the user to simulate differential expression between
 timepoints/groups using two parameters which must be manually set by the
 user: `propDE` which controls the proportion of genes differentially
 expressed, and `deLogFC` which controls the log$_2$ fold change values
@@ -705,12 +705,12 @@ timepoints with a $\pm1$ log$_2$ fold change, cells from different
 timepoints cluster separately.
 
 If we simulate three timepoints, the cells cluster sequentially by
-timepoint since `RESCUE` simulates linear differential expression across
+timepoint since `rescueSim` simulates linear differential expression across
 time.
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Manually changing DE Params
-myParams_de_2timepoints <- updateRescueParams(myParams, list(
+myParams_de_2timepoints <- updateRescueSimParams(myParams, list(
   propDE = .2, deLogFC = 1
 ))
 
@@ -728,7 +728,7 @@ scater::plotTSNE(simDat_de_2timepoints, colour_by = "time")
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Manually changing DE Params
-myParams_de_3timepoints <- updateRescueParams(myParams, list(
+myParams_de_3timepoints <- updateRescueSimParams(myParams, list(
   propDE = .2, deLogFC = 1,
   nTimepoints = 3
 ))
@@ -752,7 +752,7 @@ the rest of the cells.
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Manually changing DE Params
-myParams_de_2groups <- updateRescueParams(myParams, list(
+myParams_de_2groups <- updateRescueSimParams(myParams, list(
   propDE = .2, deLogFC = 1,
   twoGroupDesign = T,
   nTimepoints = 2

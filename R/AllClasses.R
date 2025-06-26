@@ -1,6 +1,6 @@
-#' The RescueParams Class
+#' The RescueSimParams Class
 #'
-#' Class for holding parameters used to simulate data using \code{RESCUE}
+#' Class for holding parameters used to simulate data using \code{rescueSim}
 #'
 #' @slot nTimepoints Number of timepoints (i.e. samples) per subject.
 #' Holds a single numeric value >0 representing the number of timepoints for
@@ -115,7 +115,7 @@
 #' @export
 
 
-setClass("RescueParams",
+setClass("RescueSimParams",
          slots = c(
              nTimepoints = "numeric",
              twoGroupDesign = "logical",
@@ -138,9 +138,9 @@ setClass("RescueParams",
 )
 
 
-#' Generate RescueParams object
+#' Generate RescueSimParams object
 #'
-#' @return An object of class \code{RescueParams}
+#' @return An object of class \code{RescueSimParams}
 #'
 #' @param ... Any parameter name followed by initial valus
 #'
@@ -148,35 +148,35 @@ setClass("RescueParams",
 #'
 #' @examples
 #' ## Create params object
-#' myParams <- RescueParams()
+#' myParams <- RescueSimParams()
 #'
 #' ## Create parameter object with nTimepoints and nSubjsPerGroup pre-set
-#' myParams <- RescueParams(nTimepoints = 2, nSubjsPerGroup = 5)
+#' myParams <- RescueSimParams(nTimepoints = 2, nSubjsPerGroup = 5)
 #'
 #' @export
 
-RescueParams <- function(deLogFC = 0, propDE = 0, ...) {
-    obj <- methods::new("RescueParams",deLogFC = deLogFC, propDE = propDE,...)
+RescueSimParams <- function(deLogFC = 0, propDE = 0, ...) {
+    obj <- methods::new("RescueSimParams",deLogFC = deLogFC, propDE = propDE,...)
     methods::validObject(obj)
     obj
 }
 
-#' Update RescueParams object
+#' Update RescueSimParams object
 #'
-#' Manually update parameters in RescueParams object
+#' Manually update parameters in RescueSimParams object
 #'
-#' @param paramObj Object of class \code{\link{RescueParams-class}}
+#' @param paramObj Object of class \code{\link{RescueSimParams-class}}
 #' @param paramValues List of parameter values with list names are the parameter
 #'  names
 #'
-#' @return Object of class \code{\link{RescueParams-class}} with specified parameters updated
+#' @return Object of class \code{\link{RescueSimParams-class}} with specified parameters updated
 #'
 #' @examples
 #' ## Create Parameter object
-#' myParams <- RescueParams()
+#' myParams <- RescueSimParams()
 #'
 #' ## Update nTimepoints and nSubjsPerGroup
-#' myParams <- updateRescueParams(
+#' myParams <- updateRescueSimParams(
 #'   paramObj = myParams,
 #'   paramValues = list(
 #'     nTimepoints = 3,
@@ -184,12 +184,12 @@ RescueParams <- function(deLogFC = 0, propDE = 0, ...) {
 #'   )
 #' )
 #' ## Check Values
-#' getRescueParam(myParams, "nTimepoints")
-#' getRescueParam(myParams, "nSubjsPerGroup")
+#' getRescueSimParam(myParams, "nTimepoints")
+#' getRescueSimParam(myParams, "nSubjsPerGroup")
 #'
 #' @export
 
-updateRescueParams <- function(paramObj, paramValues) {
+updateRescueSimParams <- function(paramObj, paramValues) {
     for (name in names(paramValues)) {
         methods::slot(paramObj, name) <- paramValues[[name]]
     }
@@ -199,23 +199,23 @@ updateRescueParams <- function(paramObj, paramValues) {
 
 #' Extract Parameters
 #'
-#' Extract individual parameters from RescueParams object
+#' Extract individual parameters from RescueSimParams object
 #'
-#' @param paramObj Object of class \code{\link{RescueParams-class}}
+#' @param paramObj Object of class \code{\link{RescueSimParams-class}}
 #' @param paramName String containing parameter you would like to extract
 #'
 #' @return Specified parameter value
 #'
 #' @examples
 #' ## Create Parameter object
-#' myParams <- RescueParams(nTimepoints = 2)
+#' myParams <- RescueSimParams(nTimepoints = 2)
 #'
 #' ## Check Values
-#' getRescueParam(myParams, "nTimepoints")
+#' getRescueSimParam(myParams, "nTimepoints")
 #'
 #' @export
 
-getRescueParam <- function(paramObj, paramName) {
+getRescueSimParam <- function(paramObj, paramName) {
     methods::slot(paramObj, paramName)
 }
 
@@ -223,7 +223,7 @@ getRescueParam <- function(paramObj, paramName) {
 ## Helper Functions
 
 ## Check param validity
-rescueParamsValidity <- function(object) {
+rescueSimParamsValidity <- function(object) {
     ## Make sure values have the right lengths
     param_lengths <- vapply(
         methods::slotNames(object), function(slot) {
@@ -266,7 +266,7 @@ rescueParamsValidity <- function(object) {
     }
 }
 
-setValidity("RescueParams", rescueParamsValidity)
+setValidity("RescueSimParams", rescueSimParamsValidity)
 
 
 
@@ -309,16 +309,16 @@ setValidity("RescueParams", rescueParamsValidity)
     cellsPerSampErr <- NULL
     if (any(cellsPerSampIndicator) &
         param_lengths["twoGroupDesign"] == 1) {
-        nsubjs <- ifelse(getRescueParam(object, "twoGroupDesign"),
-                         2 * getRescueParam(object, "nSubjsPerGroup"),
-                         getRescueParam(object, "nSubjsPerGroup")
+        nsubjs <- ifelse(getRescueSimParam(object, "twoGroupDesign"),
+                         2 * getRescueSimParam(object, "nSubjsPerGroup"),
+                         getRescueSimParam(object, "nSubjsPerGroup")
         )
 
-        nsamps <- nsubjs * getRescueParam(object, "nTimepoints")
+        nsamps <- nsubjs * getRescueSimParam(object, "nTimepoints")
 
-        nconditions <- ifelse(getRescueParam(object, "twoGroupDesign"),
-                              2 * getRescueParam(object, "nTimepoints"),
-                              getRescueParam(object, "nTimepoints")
+        nconditions <- ifelse(getRescueSimParam(object, "twoGroupDesign"),
+                              2 * getRescueSimParam(object, "nTimepoints"),
+                              getRescueSimParam(object, "nTimepoints")
         )
 
         cellsPerSampIndicator <-

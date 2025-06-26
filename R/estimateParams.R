@@ -1,11 +1,11 @@
-#' Estimate RESCUE Parameters
+#' Estimate rescueSim Parameters
 #'
 #' Estimate parameters to be used to simulate repeated measures scRNA-Seq data
 #' @param sce \code{\link[SingleCellExperiment]{SingleCellExperiment}} object
 #' containing empirical data with a counts matrix in the \code{counts} slot and
 #' cell level data (ex. sample/subject/timepoint labels) in the \code{colData}
 #' slot.
-#' @param paramObj \code{\link{RescueParams-class}} object with empty slots
+#' @param paramObj \code{\link{RescueSimParams-class}} object with empty slots
 #' for parameters which need to be estimated and parameters. If \code{NULL},
 #' all parameter values will be estimated.
 #' @param sampleVariable String denoting name of sample identifier variable in
@@ -32,7 +32,7 @@
 #' each condition (group/timepoint) or overall.
 #'
 #' @details
-#' All parameters in \code{\link{RescueParams-class}} object can be
+#' All parameters in \code{\link{RescueSimParams-class}} object can be
 #' estimated/extracted from empirical data except \code{propDE} and
 #' \code{deLogFC} which are both set to 0 (no differential expression) if not
 #' set manually. If a paramObj is provided, only parameters with empty slots in
@@ -48,7 +48,7 @@
 #' RecAM_sce_small <- RecAM_sce[1:40, ]
 #'
 #' ## Estimate all parameters from the data
-#' myParams_estimated <- estRescueParams(
+#' myParams_estimated <- estRescueSimParams(
 #'   sce = RecAM_sce_small, paramObj = NULL,
 #'   sampleVariable = "sampleID",
 #'   subjectVariable = "subjectID",
@@ -62,9 +62,9 @@
 #' ## Subset the data to a single timepoint
 #' RecAM_sce_single_time <- RecAM_sce_small[, RecAM_sce_small$time == "time0"]
 #' ## Create a params object with necessary parameters filled
-#' myParams <- RescueParams(subjectFacVarMean = -4, subjectFacVarSD = 1, nSubjsPerGroup = 5)
+#' myParams <- RescueSimParams(subjectFacVarMean = -4, subjectFacVarSD = 1, nSubjsPerGroup = 5)
 #' ## Estimate remaining parameters from the data
-#' myParams_estimated <- estRescueParams(
+#' myParams_estimated <- estRescueSimParams(
 #'   sce = RecAM_sce_single_time,
 #'   paramObj = myParams,
 #'   sampleVariable = "sampleID"
@@ -72,7 +72,7 @@
 #'
 #' @export
 
-estRescueParams <- function(sce, paramObj = NULL,
+estRescueSimParams <- function(sce, paramObj = NULL,
                             sampleVariable = NULL,
                             subjectVariable = NULL,
                             groupVariable = NULL,
@@ -84,7 +84,7 @@ estRescueParams <- function(sce, paramObj = NULL,
 
     ## Check params is good
     if(!is.null(paramObj)){
-        checkmate::assertClass(paramObj, "RescueParams")
+        checkmate::assertClass(paramObj, "RescueSimParams")
     }
 
     ## Check sample var and subject and group variable var are in sce
@@ -115,12 +115,12 @@ estRescueParams <- function(sce, paramObj = NULL,
     checkmate::assertLogical(cellParamsByCondition)
 
     ## Make params object if not provided
-    if (is.null(paramObj)) paramObj <- RescueParams()
+    if (is.null(paramObj)) paramObj <- RescueSimParams()
 
     ## Find which slots need to be estimated
     est_indicator <- vapply(
         methods::slotNames(paramObj), function(slot) {
-            length(getRescueParam(paramObj, slot)) == 0
+            length(getRescueSimParam(paramObj, slot)) == 0
         },
         logical(1)
     )
@@ -174,19 +174,19 @@ estRescueParams <- function(sce, paramObj = NULL,
                                subjectVariable=subjectVariable, groupVariable=groupVariable,
                                logLibMeanSD=logLibMeanSD, timepointVariable=timepointVariable)
 
-        twoGroupDesign <- getRescueParam(paramObj, "twoGroupDesign")
-        nTimepoints <- getRescueParam(paramObj, "nTimepoints")
+        twoGroupDesign <- getRescueSimParam(paramObj, "twoGroupDesign")
+        nTimepoints <- getRescueSimParam(paramObj, "nTimepoints")
 
         if (batch_var_indicator) {
             if (!est_indicator[["dispersion"]]) {
                 phi <- .estPhi(sce, sampleVariable)
             } else {
-                phi <- getRescueParam(paramObj, "dispersion")
+                phi <- getRescueSimParam(paramObj, "dispersion")
             }
             if (!est_indicator[["exprsMean"]]) {
                 means <- .estMeanExpr(sce, sampleVariable)
             } else {
-                means <- getRescueParam(paramObj, "exprsMean")
+                means <- getRescueSimParam(paramObj, "exprsMean")
             }
 
             batchVarParams <- .estBatchVarParams(
@@ -277,7 +277,7 @@ estRescueParams <- function(sce, paramObj = NULL,
         )
     })
     names(param_list) <- param_names
-    updateRescueParams(paramObj, param_list)
+    updateRescueSimParams(paramObj, param_list)
 }
 
 

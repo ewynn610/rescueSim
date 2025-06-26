@@ -2,7 +2,7 @@
 #'
 #' Simulate Repeated Measures scRNA-seq Data using the RESCUE method
 #'
-#' @param paramObj \code{\link{RescueParams-class}} object with no empty slots.
+#' @param paramObj \code{\link{RescueSimParams-class}} object with no empty slots.
 #'
 #' @return \code{\link[SingleCellExperiment]{SingleCellExperiment}} object with
 #' the data in the following slots
@@ -45,13 +45,13 @@
 #' @export
 
 simRescueData <- function(paramObj) {
-    ## Check that it is a RescueParams class
-    checkmate::assertClass(paramObj, "RescueParams")
+    ## Check that it is a RescueSimParams class
+    checkmate::assertClass(paramObj, "RescueSimParams")
 
     ## Make sure no parameter (besides customLibSizes) is equal to zero
     check_empty <- vapply(
         methods::slotNames(paramObj)[methods::slotNames(paramObj)!="customLibSizes"], function(slot) {
-            length(getRescueParam(paramObj, slot)) == 0
+            length(getRescueSimParam(paramObj, slot)) == 0
         },
         logical(1)
     )
@@ -64,44 +64,44 @@ simRescueData <- function(paramObj) {
 
     ## Get Library Sizes
     libSizeFacs <- .drawLibFacs(
-        getRescueParam(paramObj, "logLibFacVar"),
+        getRescueSimParam(paramObj, "logLibFacVar"),
         colDat$sampleID
     )
     libSizes <- .drawLibSizes(
         libSizeFacs,
-        getRescueParam(paramObj, "logLibMean"),
-        getRescueParam(paramObj, "logLibSD"),
-        getRescueParam(paramObj, "customLibSizes")
+        getRescueSimParam(paramObj, "logLibMean"),
+        getRescueSimParam(paramObj, "logLibSD"),
+        getRescueSimParam(paramObj, "customLibSizes")
     )
 
     ## Simulate batch factors
-    exprsMean <- getRescueParam(paramObj, "exprsMean")
+    exprsMean <- getRescueSimParam(paramObj, "exprsMean")
     nGenes <- length(exprsMean)
     batchVars <- .drawBatchVars(
         nGenes,
-        getRescueParam(paramObj, "sampleFacVarMean"),
-        getRescueParam(paramObj, "sampleFacVarSD"),
-        getRescueParam(paramObj, "subjectFacVarMean"),
-        getRescueParam(paramObj, "subjectFacVarSD"),
-        nTimepoints=getRescueParam(paramObj, "nTimepoints")
+        getRescueSimParam(paramObj, "sampleFacVarMean"),
+        getRescueSimParam(paramObj, "sampleFacVarSD"),
+        getRescueSimParam(paramObj, "subjectFacVarMean"),
+        getRescueSimParam(paramObj, "subjectFacVarSD"),
+        nTimepoints=getRescueSimParam(paramObj, "nTimepoints")
     )
 
     dir_batch <- .drawBatchFacs(
         batchVars, colDat$sampleID, colDat$subjectID,
-        getRescueParam(paramObj, "nSubjsPerGroup")
+        getRescueSimParam(paramObj, "nSubjsPerGroup")
     )
 
 
 
     de <- .setDE(
-        deLogFC =getRescueParam(paramObj, "deLogFC"),
-        propDE = getRescueParam(paramObj, "propDE"),
+        deLogFC =getRescueSimParam(paramObj, "deLogFC"),
+        propDE = getRescueSimParam(paramObj, "propDE"),
         nGenes = nGenes,
         colDat = colDat
     )
 
     ## Simulate True Expression values
-    trueExprs <- .simTrueExprs(getRescueParam(paramObj, "dispersion"),
+    trueExprs <- .simTrueExprs(getRescueSimParam(paramObj, "dispersion"),
                                exprsMean = exprsMean,
                                de = de$de, a = dir_batch$a, b = dir_batch$b
     )
@@ -115,7 +115,8 @@ simRescueData <- function(paramObj) {
     rownames(colDat) <- paste0("cell", seq_len(nrow(colDat)))
 
     if(!is.null(de$deFacs)){
-        rowDat <- data.frame(deLogFC = de$deFacs, row.names = rownames(counts))
+        rowDat <- data.frame(de$deFacs, row.names = rownames(counts))
+        colnames(rowDat) <- paste0("deLogFC.", names(de$deFacs))
     }else rowDat=NULL
 
 
@@ -137,11 +138,11 @@ simRescueData <- function(paramObj) {
 
 .getBasicMeta <- function(paramObj) {
     ## Extract paramObj
-    nSubjsPerGroup <- getRescueParam(paramObj, "nSubjsPerGroup")
-    nTimepoints <- getRescueParam(paramObj, "nTimepoints")
-    nGroups <- ifelse(getRescueParam(paramObj, "twoGroupDesign"), 2, 1)
-    maxCellsPerSamp <- getRescueParam(paramObj, "maxCellsPerSamp")
-    minCellsPerSamp <- getRescueParam(paramObj, "minCellsPerSamp")
+    nSubjsPerGroup <- getRescueSimParam(paramObj, "nSubjsPerGroup")
+    nTimepoints <- getRescueSimParam(paramObj, "nTimepoints")
+    nGroups <- ifelse(getRescueSimParam(paramObj, "twoGroupDesign"), 2, 1)
+    maxCellsPerSamp <- getRescueSimParam(paramObj, "maxCellsPerSamp")
+    minCellsPerSamp <- getRescueSimParam(paramObj, "minCellsPerSamp")
 
 
     ## Get nsamps

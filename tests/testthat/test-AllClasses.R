@@ -1,5 +1,5 @@
-blankParams <- RescueParams()
-fullParams <- RescueParams(
+blankParams <- RescueSimParams()
+fullParams <- RescueSimParams(
   logLibFacVar = 1, logLibMean = 1, logLibSD = 1,
   exprsMean = c(1, 1, 1), dispersion = c(1, 1, 1),
   sampleFacVarMean = 1, sampleFacVarSD = 1,
@@ -9,14 +9,14 @@ fullParams <- RescueParams(
   propDE = 0, deLogFC = 0
 )
 
-test_that("getRescueParam working", {
+test_that("getRescueSimParam working", {
   expect_equal(
-    lapply(slotNames(fullParams), getRescueParam, paramObj = fullParams),
+    lapply(slotNames(fullParams), getRescueSimParam, paramObj = fullParams),
     list(1, FALSE, 1, 1, 1, 1, 1, 1, numeric(0), c(1, 1, 1), c(1, 1, 1), 1, 1, 1, 1, 0, 0)
   )
 })
 
-test_that("updateRescueParams working", {
+test_that("updateRescueSimParams working", {
   paramLS <- list(
     logLibFacVar = 1, logLibMean = 1, logLibSD = 1,
     exprsMean = c(1, 1, 1), dispersion = c(1, 1, 1),
@@ -26,7 +26,7 @@ test_that("updateRescueParams working", {
     nTimepoints = 1, maxCellsPerSamp = 1, minCellsPerSamp = 1,
     propDE = 0, deLogFC = 0
   )
-  expect_equal(updateRescueParams(blankParams, paramLS), fullParams)
+  expect_equal(updateRescueSimParams(blankParams, paramLS), fullParams)
 })
 
 test_that(".checkSingleValueParams working", {
@@ -46,7 +46,7 @@ test_that(".checkSingleValueParams working", {
 
   lapply(singleValueSlots, function(x) {
     expect_error(
-      updateRescueParams(fullParams, singleValList),
+      updateRescueSimParams(fullParams, singleValList),
       paste("Parameter", x, "should contain a single value")
     )
   })
@@ -54,7 +54,7 @@ test_that(".checkSingleValueParams working", {
 
 test_that(".checkGeneParamLengths working", {
   expect_error(
-    updateRescueParams(
+    updateRescueSimParams(
       fullParams,
       list(
         exprsMean = c(1, 1),
@@ -64,7 +64,7 @@ test_that(".checkGeneParamLengths working", {
     "Parameters exprsMean and dispersion must be vectors of equal length"
   )
     expect_error(
-        updateRescueParams(
+        updateRescueSimParams(
             fullParams,
             list(
                 twoGroupDesign=F,
@@ -79,19 +79,19 @@ test_that(".checkGeneParamLengths working", {
 })
 
 test_that("deLogFC: numeric values pass validation", {
-    expect_silent(updateRescueParams(fullParams, list(deLogFC = 1)))
-    expect_silent(updateRescueParams(fullParams, list(deLogFC = rnorm(3))))
+    expect_silent(updateRescueSimParams(fullParams, list(deLogFC = 1)))
+    expect_silent(updateRescueSimParams(fullParams, list(deLogFC = rnorm(3))))
 })
 
 test_that("deLogFC: list with missing nTimepoints triggers error", {
     broken <- fullParams
     methods::slot(broken, "nTimepoints") <- numeric(0)
-    expect_error(updateRescueParams(broken, list(deLogFC = list(time1 = rnorm(3)))),
+    expect_error(updateRescueSimParams(broken, list(deLogFC = list(time1 = rnorm(3)))),
                  regexp = "must be specified")
 })
 
 test_that("deLogFC: one timepoint and one group triggers error", {
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 1,
         twoGroupDesign = FALSE,
         deLogFC = list(time1 = rnorm(3))
@@ -99,12 +99,12 @@ test_that("deLogFC: one timepoint and one group triggers error", {
 })
 
 test_that("deLogFC: one timepoint, two groups - group1 valid, group0 invalid", {
-    expect_silent(updateRescueParams(fullParams, list(
+    expect_silent(updateRescueSimParams(fullParams, list(
         nTimepoints = 1,
         twoGroupDesign = TRUE,
         deLogFC = list(group1 = rnorm(3))
     )))
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 1,
         twoGroupDesign = TRUE,
         deLogFC = list(group0 = rnorm(3))
@@ -112,7 +112,7 @@ test_that("deLogFC: one timepoint, two groups - group1 valid, group0 invalid", {
 })
 
 test_that("deLogFC: multi-timepoint, one group - time0 invalid", {
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
         deLogFC = list(time0 = rnorm(3))
@@ -126,7 +126,7 @@ test_that("deLogFC: multi-timepoint, two groups - valid names only", {
         time2_group0 = rnorm(3),
         time2_group1 = rnorm(3)
     )
-    expect_silent(updateRescueParams(fullParams, list(
+    expect_silent(updateRescueSimParams(fullParams, list(
         nTimepoints = 3,
         twoGroupDesign = TRUE,
         deLogFC = good
@@ -134,7 +134,7 @@ test_that("deLogFC: multi-timepoint, two groups - valid names only", {
 
     bad <- good
     bad$time0_group0 <- rnorm(3)
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 3,
         twoGroupDesign = TRUE,
         deLogFC = bad
@@ -143,7 +143,7 @@ test_that("deLogFC: multi-timepoint, two groups - valid names only", {
 
 test_that("deLogFC: unnamed list triggers error", {
     unnamed <- list(rnorm(3), rnorm(3))
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
         deLogFC = unnamed
@@ -151,13 +151,13 @@ test_that("deLogFC: unnamed list triggers error", {
 })
 
 test_that("deLogFC: unexpected and missing names are caught", {
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
         deLogFC = list(foo = rnorm(3))
     )), regexp = "Unexpected names")
 
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 3,
         twoGroupDesign = FALSE,
         deLogFC = list(time1 = rnorm(3))  # missing time2
@@ -165,7 +165,7 @@ test_that("deLogFC: unexpected and missing names are caught", {
 })
 
 test_that("deLogFC: non-numeric elements trigger error", {
-    expect_error(updateRescueParams(fullParams, list(
+    expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
         deLogFC = list(time1 = "not numeric")
@@ -196,7 +196,7 @@ test_that(".checkCellsPerSampLength working", {
   lapply(wrongParams, function(ls) {
     lapply(c("maxCellsPerSamp", "minCellsPerSamp"), function(x) {
       expect_error(
-        updateRescueParams(fullParams, ls),
+        updateRescueSimParams(fullParams, ls),
         paste0(
           "Parameter ", x,
           " should contain a single value (",
@@ -210,7 +210,7 @@ test_that(".checkCellsPerSampLength working", {
   lapply(rightParams, function(ls) {
     lapply(c("maxCellsPerSamp", "minCellsPerSamp"), function(x) {
       expect_no_error(
-        updateRescueParams(fullParams, ls)
+        updateRescueSimParams(fullParams, ls)
       )
     })
   })

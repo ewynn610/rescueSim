@@ -7,7 +7,7 @@
 simRescueData(paramObj)
 }
 \arguments{
-\item{paramObj}{\code{\link{RescueParams-class}} object with no empty slots.}
+\item{paramObj}{\code{\link{RescueSimParams-class}} object with no empty slots.}
 }
 \value{
 \code{\link[SingleCellExperiment]{SingleCellExperiment}} object with
