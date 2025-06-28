@@ -11,16 +11,15 @@
 #' @param sampleVariable String denoting name of sample identifier variable in
 #' the \code{colData} of \code{SingleCellExperiment} object. If \code{NULL},
 #' data is assumed to contain only one sample parameters
-#' \code{logLibFacVar}, \code{sampleFacVarMean}, \code{sampleFacVarSD},
-#' \code{subjectFacVarMean}, and \code{subjectFacVarSD} parameters
+#'  \code{sampleFacVarMean} and \code{sampleFacVarSD} parameters
 #' cannot be estimated.
 #' @param subjectVariable String denoting name of subject identifier variable in
 #'  the \code{colData} of \code{SingleCellExperiment} object. If \code{NULL},
-#'  parameters \code{nSubjsPerGroup}, \code{subjectFacVarMean}, and
+#'  parameters \code{subjectFacVarMean} and
 #'  \code{subjectFacVarSD} parameters cannot be estimated.
 #' @param timepointVariable String denoting name of timepoint identifier
 #' variable in the \code{colData} of \code{SingleCellExperiment} object.
-#' If \code{NULL}, the number of timepoints for the simulated data is set to 2.
+#' If \code{NULL}, the number of timepoints for the simulated data is set to 1.
 #' @param groupVariable String denoting name of group identifier variable in
 #' the \code{colData} of \code{SingleCellExperiment} object. If \code{NULL}, a
 #' single group design is assumed.
@@ -34,7 +33,7 @@
 #' @details
 #' All parameters in \code{\link{RescueSimParams-class}} object can be
 #' estimated/extracted from empirical data except \code{propDE} and
-#' \code{deLogFC} which are both set to 0 (no differential expression) if not
+#' \code{deLog2FC} which are both set to 0 (no differential expression) if not
 #' set manually. If a paramObj is provided, only parameters with empty slots in
 #' the object will be estimated.
 #'
@@ -106,6 +105,12 @@ estRescueSimParams <- function(sce, paramObj = NULL,
         }
     })
 
+    ## Check if subjectVariable is specified without sampleVariable
+    # if (is.null(sampleVariable) && !is.null(subjectVariable)) {
+    #     stop("You have specified a subjectVariable without specifying a sampleVariable.
+    #     If your data includes multiple samples per subject, please provide a sampleVariable as well.
+    #     If there is only one sample per subject, please specify a sampleVariable and do not specify a subjectVariable.")
+    # }
 
 
     ## Check nonde genes are in sce
@@ -125,6 +130,41 @@ estRescueSimParams <- function(sce, paramObj = NULL,
         logical(1)
     )
 
+
+
+
+    ## If no sample variable, make all into one sample
+    if(is.null(sampleVariable)){
+        sampleVariable="sample"
+        sce[[sampleVariable]]<-"sample1"
+
+        est_indicator["sampleFacVarMean"]<-est_indicator["sampleFacVarSD"]<-
+            FALSE
+        warning("Since sampleVariable is NULL, sampleFacVarMean and sampleFacVarSD cannot be estimated.")
+
+    }else if(length(unique(sce[[sampleVariable]])) == 1){
+        est_indicator["sampleFacVarMean"]<-est_indicator["sampleFacVarSD"]<-
+            FALSE
+        warning("Since there is only one unique sample, sampleFacVarMean and sampleFacVarSD cannot be estimated.")
+
+    }
+
+    if(is.null(subjectVariable)){
+            subjectVariable="subject"
+            sce[[subjectVariable]]<-"subject1"
+
+        est_indicator["subjectFacVarMean"]<-est_indicator["subjectFacVarSD"]<-
+            FALSE
+        warning("Since subjectVariable is NULL, subjectFacVarMean and subjectFacVarSD cannot be estimated.")
+
+    }else if(length(unique(sce[[subjectVariable]])) == 1){
+            est_indicator["sampleFacVarMean"]<-est_indicator["sampleFacVarSD"]<-
+                FALSE
+            warning("Since there is only one unique sample, sampleFacVarMean and sampleFacVarSD cannot be estimated.")
+
+        }
+
+
     ## Go through estimation process if any need to be estimated
     if (any(est_indicator)) {
         ## Never estimate customLibSizes
@@ -136,7 +176,6 @@ estRescueSimParams <- function(sce, paramObj = NULL,
             "sampleFacVarSD", "subjectFacVarMean", "subjectFacVarSD"
         )
         norm_data_indicator <- any(est_indicator[norm_data_slots])
-
         ## Check if batch parameters need to be estimated
         batch_var_slots <- c("sampleFacVarSD", "subjectFacVarMean", "subjectFacVarSD")
         batch_var_indicator <- any(est_indicator[batch_var_slots])
@@ -208,8 +247,6 @@ estRescueSimParams <- function(sce, paramObj = NULL,
         } else {
             cellsPerSamp <- NULL
         }
-
-
 
         paramObj <- .getParams(
             names(est_indicator[est_indicator]),
@@ -283,23 +320,30 @@ estRescueSimParams <- function(sce, paramObj = NULL,
 
 ## Function to estimate library factor variances
 .estLibFactorVar <- function(sce, sampleVariable) {
-    ## make dataframe of library sizes and sample the cell came from
-    lib_sizes <- data.frame(
-        log_lib_size = log(Matrix::colSums(SingleCellExperiment::counts(sce))),
-        sample_id = sce[[sampleVariable]]
-    )
+    ## If only one sample, variance is 0, otherwise estimate
+    if(length(unique(sce[[sampleVariable]]))==1){
+        return(0)
+    }else{
+        ## make dataframe of library sizes and sample the cell came from
+        lib_sizes <- data.frame(
+            log_lib_size = log(Matrix::colSums(SingleCellExperiment::counts(sce))),
+            sample_id = sce[[sampleVariable]]
+        )
 
-    ## Find multiplicative factors showing how average sample lib. size differs
+        ## Find multiplicative factors showing how average sample lib. size differs
 
-    lib_means <- stats::aggregate(lib_sizes$log_lib_size,
-                                  list(sample_id = lib_sizes$sample_id),
-                                  FUN = mean
-    )
-    overall_mean <- mean(lib_means$x)
-    lib_size_facs <- lib_means$x / overall_mean
+        lib_means <- stats::aggregate(lib_sizes$log_lib_size,
+                                      list(sample_id = lib_sizes$sample_id),
+                                      FUN = mean
+        )
+        overall_mean <- mean(lib_means$x)
+        lib_size_facs <- lib_means$x / overall_mean
 
-    ## Take variance of library size factors
-    stats::var(lib_size_facs)
+        ## Take variance of library size factors
+        stats::var(lib_size_facs)
+
+    }
+
 }
 
 ## Get mean/sd log library size
@@ -335,7 +379,9 @@ estRescueSimParams <- function(sce, paramObj = NULL,
 
 ## Estimate mean (normalized) expression
 .estMeanExpr <- function(sce, sampleVariable) {
-    if (!is.null(sampleVariable)) {
+
+    ## If more than one sample, take mean of sample means, otherwise just take row means
+    if (length(sce[[sampleVariable]])>1) {
         samp_means=suppressMessages(dplyr::bind_cols(lapply(unique(sce[[sampleVariable]]), function(x){
             rowMeans(SingleCellExperiment::normcounts(sce)[,sce[[sampleVariable]]==x])
         })))
@@ -485,33 +531,44 @@ estRescueSimParams <- function(sce, paramObj = NULL,
 
 .estNTimepoints <- function(sce, timepointVariable) {
     if (is.null(timepointVariable)) {
-        return(2)
+        return(1)
     } else {
         return(length(unique(sce[[timepointVariable]])))
     }
 }
 
 .estnSubjsPerGroup <- function(sce, subjectVariable, groupVariable, twoGroupDesign) {
-    nGroups <- ifelse(twoGroupDesign, 2, 1)
+    nGroupsExpected <- ifelse(twoGroupDesign, 2, 1)
+
     if (is.null(groupVariable)) {
-        nSubjsPerGroup <- length(table(sce[[subjectVariable]]))
-        return(nSubjsPerGroup)
+        # No group info: just return total number of unique subjects
+        return(length(unique(sce[[subjectVariable]])))
     }
-    subj_group <- table(sce[[subjectVariable]], sce[[groupVariable]])
-    nSubjsPerGroup <- apply(subj_group, 2, function(x) sum(x != 0))
-    nGroupsPerSubj <- apply(subj_group, 1, function(x) sum(x != 0))
-    if (any(nGroupsPerSubj) > 1) stop("More than one group assigned to
-                                       subject(s) in user supplied data")
+
+    subj_group_tab <- table(sce[[subjectVariable]], sce[[groupVariable]])
+
+    # Check that each subject is assigned to only one group
+    nGroupsPerSubj <- rowSums(subj_group_tab != 0)
+    if (any(nGroupsPerSubj > 1)) {
+        stop("Each subject must belong to only one group in user-supplied data.")
+    }
+
+    # Count unique subjects in each group
+    nSubjsPerGroup <- colSums(subj_group_tab != 0)
+
     if (length(unique(nSubjsPerGroup)) == 1) {
+        # Same number of subjects per group
         return(nSubjsPerGroup[[1]])
-    } else if (length(nSubjsPerGroup) != nGroups) {
-        stop("Different number of subjects in each group in user supplied data
-        and number of groups in data does not match twoGroupDesign parameter")
-    } else {
-        names(nSubjsPerGroup) <- paste0("group", seq_len(nGroups))
-        return(nSubjsPerGroup)
     }
+
+    if (length(nSubjsPerGroup) > nGroupsExpected) {
+        stop("Number of groups in data does not match twoGroupDesign setting.")
+    }
+
+    names(nSubjsPerGroup) <- paste0("group", seq_along(nSubjsPerGroup)-1)
+    return(nSubjsPerGroup)
 }
+
 
 .estNCellParams <- function(sce, sampleVariable, cellParamsByCondition,
                             groupVariable, timepointVariable,
@@ -522,10 +579,36 @@ estRescueSimParams <- function(sce, paramObj = NULL,
             minCells <- maxCells <- ncol(sce)
         } else {
             num_cell_tab <- table(sce[[sampleVariable]])
-            minCells <- round(quantile(num_cell_tab, .1))
-            maxCells <- round(quantile(num_cell_tab, .9))
+            minCells <- unname(round(quantile(num_cell_tab, .1)))
+            maxCells <- unname(round(quantile(num_cell_tab, .9)))
         }
     } else {
+        ## ----- Consistency checks -----
+        if (!is.null(timepointVariable)) {
+            nTimepointVals <- length(unique(sce[[timepointVariable]]))
+            if (nTimepointVals != nTimepoints) {
+                stop(sprintf(
+                    "cellParamsByCondition = TRUE: Number of unique timepoints in data (%d) does not match nTimepoints (%d).",
+                    nTimepointVals, nTimepoints
+                ))
+            }
+        }
+
+        if (!is.null(groupVariable)) {
+            nGroupVals <- length(unique(sce[[groupVariable]]))
+            if (twoGroupDesign && nGroupVals != 2) {
+                stop(sprintf(
+                    "cellParamsByCondition = TRUE: twoGroupDesign = TRUE but data has %d unique groups (should be 2).",
+                    nGroupVals
+                ))
+            }
+            if (!twoGroupDesign && nGroupVals != 1) {
+                stop(sprintf(
+                    "cellParamsByCondition = TRUE: twoGroupDesign = FALSE but data has %d unique groups (should be 1).",
+                    nGroupVals
+                ))
+            }
+        }
         nGroups <- ifelse(twoGroupDesign, 2, 1)
         if (is.null(groupVariable) & is.null(timepointVariable)) {
             stop("To estimate number of cell parameters by condition,
@@ -561,14 +644,25 @@ estRescueSimParams <- function(sce, paramObj = NULL,
         group_df <- expand.grid(
             group = paste0(
                 "group",
-                seq_len(nGroups)
+                seq_len(nGroups)-1
             ),
-            timepoint = paste0("timepoint", seq_len(nTimepoints))
+            timepoint = paste0("time", seq_len(nTimepoints)-1)
         )
-        names(minCells) <- names(maxCells) <- paste(group_df$group,
-                                                    group_df$timepoint,
-                                                    sep = "_"
-        )
+        if(!twoGroupDesign){
+            names(minCells) <- names(maxCells) <- paste(group_df$timepoint,
+                                                        sep = "_"
+            )
+        }else if(nTimepoints==1){
+            names(minCells) <- names(maxCells) <- paste(group_df$group,
+                                                        sep = "_"
+            )
+        }else{
+            names(minCells) <- names(maxCells) <- paste(group_df$timepoint,
+                                                        group_df$group,
+                                                        sep = "_"
+            )
+        }
+
     }
     list(minCells = minCells, maxCells = maxCells)
 }

@@ -3,6 +3,8 @@
 export(RescueSimParams)
 export(estRescueSimParams)
 export(getRescueSimParam)
+export(isDEbetweenConditions)
+export(runRescueSimPower)
 export(simRescueData)
 export(updateRescueSimParams)
 exportClasses(RescueSimParams)

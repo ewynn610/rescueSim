@@ -20,7 +20,7 @@
 #'     }
 #' \item{\code{rowData}}{
 #'   \describe{
-#'     \item{deLogFC}{A \code{DataFrame} containing log2 fold change information for each gene.
+#'     \item{deLog2FC}{A \code{DataFrame} containing log2 fold change information for each gene.
 #'     Each column corresponds to a non-reference experimental condition
 #'     (e.g., \code{"time1"}, \code{"group1"}, \code{"time1_group1"}, etc.), and values represent
 #'     gene-level log2 fold changes relative to the baseline condition
@@ -32,8 +32,14 @@
 #' }
 #'
 #' @examples
-#' # Read in parameter object
-#' data("RecAM_params")
+#' # Read in data
+#'  data("RecAM_sce")
+#'
+#'  # Calculate sim parameters for first 50 genes
+#' RecAM_sce <- RecAM_sce[1:50,]
+#' RecAM_params<-estRescueSimParams(RecAM_sce, sampleVariable = "sampleID",
+#' subjectVariable = "subjectID", timepointVariable = "time")
+#'
 #'
 #' # Simulate data
 #' simDat=simRescueData(RecAM_params)
@@ -94,7 +100,7 @@ simRescueData <- function(paramObj) {
 
 
     de <- .setDE(
-        deLogFC =getRescueSimParam(paramObj, "deLogFC"),
+        deLog2FC =getRescueSimParam(paramObj, "deLog2FC"),
         propDE = getRescueSimParam(paramObj, "propDE"),
         nGenes = nGenes,
         colDat = colDat
@@ -116,7 +122,7 @@ simRescueData <- function(paramObj) {
 
     if(!is.null(de$deFacs)){
         rowDat <- data.frame(de$deFacs, row.names = rownames(counts))
-        colnames(rowDat) <- paste0("deLogFC.", names(de$deFacs))
+        colnames(rowDat) <- paste0("deLog2FC.", names(de$deFacs))
     }else rowDat=NULL
 
 
@@ -164,23 +170,39 @@ simRescueData <- function(paramObj) {
 
     conditions <- paste0("group", sampMeta$group, "_time", sampMeta$time)
 
+
     if (length(minCellsPerSamp) == 1) {
         sampMeta$minCellsPerSamp <- minCellsPerSamp
-        sampMeta$maxCellsPerSamp <- maxCellsPerSamp
     } else if (length(minCellsPerSamp) == length(unique(conditions))) {
         names(minCellsPerSamp) <- unique(conditions)
-        names(maxCellsPerSamp) <- unique(conditions)
         sampMeta$minCellsPerSamp <- minCellsPerSamp[conditions]
-        sampMeta$maxCellsPerSamp <- maxCellsPerSamp[conditions]
     } else if (length(minCellsPerSamp) == nrow(sampMeta)) {
         names(minCellsPerSamp) <- unique(sampMeta$sampleID)
-        names(maxCellsPerSamp) <- unique(sampMeta$sampleID)
         sampMeta$minCellsPerSamp <- minCellsPerSamp[sampMeta$sampleID]
+    }
+
+    if (length(maxCellsPerSamp) == 1) {
+        sampMeta$maxCellsPerSamp <- maxCellsPerSamp
+    } else if (length(maxCellsPerSamp) == length(unique(conditions))) {
+        names(maxCellsPerSamp) <- unique(conditions)
+        sampMeta$maxCellsPerSamp <- maxCellsPerSamp[conditions]
+    } else if (length(maxCellsPerSamp) == nrow(sampMeta)) {
+        names(maxCellsPerSamp) <- unique(sampMeta$sampleID)
         sampMeta$maxCellsPerSamp <- maxCellsPerSamp[sampMeta$sampleID]
     }
+
+    bad_idx <- which(sampMeta$minCellsPerSamp > sampMeta$maxCellsPerSamp)
+    if (length(bad_idx) > 0) {
+        warning(sprintf(
+            "minCellsPerSamp was greater than maxCellsPerSamp for %d sample(s): %s. Values were switched.",
+            length(bad_idx),
+            paste(sampMeta$sampleID[bad_idx], collapse = ", ")
+        ))
+    }
+
     nCells <- apply(sampMeta, 1, function(x) {
-        minCells <- x["minCellsPerSamp"]
-        maxCells <- x["maxCellsPerSamp"]
+        minCells <- as.numeric(x["minCellsPerSamp"])
+        maxCells <- as.numeric(x["maxCellsPerSamp"])
         if (minCells == maxCells) {
             return(minCells)
         } else {
@@ -319,7 +341,7 @@ simRescueData <- function(paramObj) {
     (n - 1 - v) / (n * v)
 }
 
-.setDE <- function(deLogFC, propDE, nGenes, colDat) {
+.setDE <- function(deLog2FC, propDE, nGenes, colDat) {
     time <- colDat$time
     group <- colDat$group
     nGroups <- length(unique(group))
@@ -327,7 +349,7 @@ simRescueData <- function(paramObj) {
     nCells <- nrow(colDat)
 
     # CASE 1: Numeric input (scalar or vector)
-    if (is.numeric(deLogFC)) {
+    if (is.numeric(deLog2FC)) {
 
         # Handle case where there's no DE to model
         if (nTimepoints == 1 && nGroups == 1) {
@@ -348,14 +370,14 @@ simRescueData <- function(paramObj) {
                            replace = TRUE,
                            prob = c(propDE, 1 - propDE))
 
-        # Symmetric logFCs if scalar
-        if (length(deLogFC) == 1) {
-            deLogFC <- c(-deLogFC, deLogFC)
+        # Symmetric Log2FCs if scalar
+        if (length(deLog2FC) == 1) {
+            deLog2FC <- c(-deLog2FC, deLog2FC)
         }
 
-        # Assign logFCs to DE genes
+        # Assign Log2FCs to DE genes
         de_facs <- rep(0, nGenes)
-        de_facs[de_genes] <- sample(deLogFC, sum(de_genes), replace = TRUE)
+        de_facs[de_genes] <- sample(deLog2FC, sum(de_genes), replace = TRUE)
 
         de_log <- matrix(design_factor, nrow = nGenes, ncol = nCells, byrow = TRUE)
         de_log <- de_log * de_facs
@@ -375,8 +397,8 @@ simRescueData <- function(paramObj) {
             }))
         }
 
-        # Build deLogFC list
-        deLogFC_list <- lapply(condition_names, function(cname) {
+        # Build deLog2FC list
+        deLog2FC_list <- lapply(condition_names, function(cname) {
             idx <- which(colNames == cname)
             if (length(idx) == 0) {
                 rep(0, nGenes)
@@ -384,14 +406,14 @@ simRescueData <- function(paramObj) {
                 rowMeans(de_log[, idx, drop = FALSE])
             }
         })
-        names(deLogFC_list) <- condition_names
+        names(deLog2FC_list) <- condition_names
 
         de <- 2^de_log
-        return(list(de = de, deFacs = deLogFC_list))
+        return(list(de = de, deFacs = deLog2FC_list))
     }
 
-    # CASE 2: List of vectors with gene-specific logFCs
-    if (is.list(deLogFC)) {
+    # CASE 2: List of vectors with gene-specific Log2FCs
+    if (is.list(deLog2FC)) {
         colNames <- character(nCells)
 
         if (nTimepoints == 1 && nGroups == 2) {
@@ -404,15 +426,15 @@ simRescueData <- function(paramObj) {
 
         # Build DE matrix from log2FCs
         de_log <- matrix(0, nrow = nGenes, ncol = nCells)
-        for (cond_name in names(deLogFC)) {
-            de_log[, colNames == cond_name] <- deLogFC[[cond_name]]
+        for (cond_name in names(deLog2FC)) {
+            de_log[, colNames == cond_name] <- deLog2FC[[cond_name]]
         }
 
         de <- 2^de_log
-        return(list(de = de, deFacs = deLogFC))
+        return(list(de = de, deFacs = deLog2FC))
     }
 
-    stop("Invalid format for deLogFC.")
+    stop("Invalid format for deLog2FC.")
 }
 
 

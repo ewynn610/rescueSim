@@ -1,0 +1,190 @@
+---
+title: "Power Analysis with rescueSim"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    df_print: kable
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+vignette: >
+  %\VignetteIndexEntry{Power Analysis with rescueSim}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+
+# Introduction
+
+One application of the `rescueSim` is to evaluate the power to detect within-cell 
+type differential gene expression in paired and longitudinal scRNA-sequencing studies, 
+as well as other complex repeated measures designs. These data are inherently high-dimensional
+and hierarchical, with multiple sources of variability, making standard closed-form 
+power or sample size calculations infeasible. Instead, simulating data and assessing power across different design scenarios (e.g., varying numbers of samples or cells) offers a 
+practical and informative approach to study planning.
+
+This vignette focuses on using `rescueSim` to perform power analysis for detecting
+differential gene expression in longitudinal or repeated-measures single-cell RNA-seq 
+studies. For an overview of the `rescueSim` simulation framework and basic usage, 
+see the Intro to `rescueSim` vignette.
+
+# Running a Power Analysis
+
+Power can be evaluated using the    `runRescueSimPower` function. This function simulates multiple data sets under different user-defined scenarios, applies a user-supplied differential expression (DE) method, and calculates power as the proportion of true DE genes correctly identified at a specified significance threshold. The table below outlines key function arguments.
+
+|     Argument    | Description                                                                                                                                                                                             | Default |
+| :-------------: | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-----: |
+|   `baseParams`  | A `RescueSimParams` object containing the base simulation parameters. These will be updated according to each scenario.                                                                                 |    —    |
+|   `scenarios`   | A `data.frame` specifying the scenarios to simulate. Each row corresponds to one scenario, with columns for parameter values to update in `baseParams`. Columns must match fields in `RescueSimParams`. |    —    |
+|   `deFunction`  | A user-supplied function that takes a simulated `SingleCellExperiment` object and returns a `data.frame` with columns `gene` and `padj`.                                                     |    —    |
+|      `nSim`     | Number of simulations to run for each scenario.                                                                                                                                                         |    1    |
+|   `padjThresh`  | Significance threshold (e.g., FDR cutoff) to define true positive DE calls.                                                                                                                             |   0.05  |
+|   `returnFDR`  | Logical indicating whether to calculate and return the false discovery rate (FDR).                                                                                                                      |  `FALSE` |
+|   `conditions`  | A character vector of length 2 specifying the conditions to compare (e.g., `c("time1", "time0")` or `c(time0_group0, time1_group1)` for two group designs). If `NULL`, the comparison is inferred based on available conditions in `rowData`.             |  `NULL` |
+| `saveSimPath` | Path to directory where simulated data sets will be saved as `.rds` files (if desired). If `NULL`, simulated data sets are not saved.                                                                     |  `NULL` |
+|  `saveDePath` | Path to directory where DE result files will be saved as `.rds` files (if desired). If `NULL`, DE results are not saved.                                                                                |  `NULL` |
+|    `verbose`    | Logical indicating whether to print progress messages during simulation.                                                                                                                                |  `TRUE` |
+|      `...`      | Additional arguments passed to `simRescueSimDat`, `deFunction`, or other internal functions.                                                                                                            |    —    |
+
+The function returns a `data.frame` containing power (and FDR if requested) for each simulation along with the scenario settings and comparison conditions.
+
+# Setting up the data
+
+For this example, we will use a data set included with the `rescueSim` package. The data set contains gene expression data for recruited airspace macrophage (RAM) cells from bronchoalveolar lavage samples collected from healthy adults. Data were collected from five subjects at two time points per subject. the data set was subset to include 1,940 genes and 970 cells. The genes included were assessed to be invariant across time points.
+
+To reduce computational cost, particularly because the differential expression analysis in this example uses MAST with random effects, which is computationally intensive, we further filter the data to include only 100 genes. Note that MAST does offer a parallelization option that can speed up the analysis. Because the data set is so small, the power estimates in this example will not be meaningful for study planning/method benchmarking. Rather, this example is used solely to illustrate the package functionality.
+
+
+```{r}
+## Load packages
+library(rescueSim)
+library(SingleCellExperiment)
+
+## Load data
+data("RecAM_sce")
+
+## Set seed and randomly select 100 cells
+set.seed(24)
+RecAM_sce <- RecAM_sce[sample(1:nrow(RecAM_sce), 100),]
+
+## Estimate params from filtered data
+simParams<-estRescueSimParams(RecAM_sce, sampleVariable = "sampleID",
+                              subjectVariable = "subjectID", 
+                              timepointVariable = "time")
+```
+
+## Differential expression function for the power analysis
+
+To run a power analysis using `runRescueSimPower`, you must supply a custom function that performs differential expression (DE) analysis on each simulated data set. this function should return a data frame containing at least:
+
+- `gene`: a gene identifier
+- `padj`: adjusted p-value (e.g. FDR adjustment)
+
+This design allows users to select a DE method appropriate for their study design.
+
+In this example, we use `MAST` with random effects to model the hierarchical structure of our paired scRNA-seq data. `MAST` allows the inclusion of random effects for sample and subject, making it a reasonable choice for accounting for correlation in our data. However, it is important to note that the performance of `MAST` (and most other DE methods) on paired/longitudinal single-cell data has not been fully evaluated. The results of this power analysis should be interpreted with this limitation in mind.
+
+Below is the custom DE function we will use. This function filters data to include only genes with expression in at least 10$\%$ of cells, applies log2(CPM+1) normalization, computes cellular detection rate, fits a MAST model with random effects for sample and subject, and returns a table with adjusted p-values for the time effect.
+
+```{r}
+
+deFun <- function(sce) {
+    # Include only genes expressed in at least 10% of cells
+    sce <- sce[rowMeans(counts(sce) != 0) >= 0.1, ]
+    
+    # Log2(CPM + 1) normalization
+    normcounts(sce) <- apply(counts(sce), 2, function(x) {
+        log2((1e6 * x / sum(x)) + 1)
+    })
+    
+    # Convert to SingleCellAssay
+    sca <- suppressMessages(MAST::FromMatrix(as.matrix(normcounts(sce)), 
+                                             colData(sce)))
+    
+    # Calculate cellular detection rate
+    cdr <- colSums(SummarizedExperiment::assay(sca) > 0)
+    colData(sca)$cngeneson <- scale(cdr)
+    
+    # Fit model
+    suppressMessages(
+        suppressWarnings({
+            zlmCond <- MAST::zlm(
+                form = ~ cngeneson + time + (1 | sampleID) + (1 | subjectID),
+                sca,
+                method = "glmer",
+                ebayes = FALSE,
+                strictConvergence = TRUE, silent = T
+            )}
+    )
+    )
+    
+    # Summarize LRT for time
+    suppressMessages(
+        suppressWarnings({
+            raw_res <- MAST::summary(zlmCond, doLRT = "timetime1")
+        })
+    )
+    sum_tab <- data.frame(raw_res$datatable)
+    
+    # Keep only the H (hypothesis) component rows
+    sum_tab <- sum_tab[sum_tab$component == "H", ]
+    
+    # Add padj and gene columns
+    sum_tab$padj <- p.adjust(sum_tab$`Pr..Chisq.`, method = "BH")
+    sum_tab$gene <- sum_tab$primerid
+    
+    return(sum_tab)
+}
+
+```
+
+# Running the power analysis
+
+We will run `runRescueSimPower` to estimate power across a couple of illustrative scenarios. We will simulate data sets where 20$\%$ of genes exhibit differential expression between two time points with a log$_2$ fold-change of $\pm0.5$. We will evaluate two scenarios:
+
+- Scenario 1: 3 subjects, 200 cells per sample
+- Scenario 2: 6 subjects, 100 cells per sample
+
+For simplicity, we will set the `minCellsPerSamp` and `maxCellsPerSamp` parameters to the same value in each scenario so that the number of cells per sample is fixed.
+
+In practice, simulations like these could be used to explore trade-offs between sequencing depth and subject recruitment. For illustration purposes here, we will simulate only 2 data sets per scenario and are using a very small number of genes, so the results produced  are not meaningful and cannot be used to reflect method performance or guide study design. The goal is simply to demonstrate how the `runRescueSimPower` function can be applied.
+
+```{r}
+## Update differential expression parameters in parameter object
+simParams <- updateRescueSimParams(simParams, 
+                                   paramValues = list(propDE=.2, deLog2FC=.5))
+
+## Define scenarios
+scenarios <- data.frame(minCellsPerSamp = c(200, 100),
+                        maxCellsPerSamp = c(200, 100),
+                        nSubjsPerGroup = c(3, 6))
+
+scenarios
+
+## Set seed for reproducibility and run
+set.seed(24)
+power_res=runRescueSimPower(baseParams = simParams, scenarios = scenarios, 
+                            deFunction = deFun, nSim = 2, returnFDR  = F)
+```
+
+The output of `runRescueSimPower` is a data frame where each row corresponds to one simulated data set, showing the scenario settings, simulation number, comparison conditions, power, and (if requested) FDR. Again, with so few genes and simulations here, the values in this example are purely illustrative and not reliable.
+
+```{r}
+power_res
+```
+
+When run with a full data set and more simulations, the output can be summarized with power curves or other visuals to explore design trade-offs.
+
+# Session Information

@@ -1,5 +1,5 @@
 ---
-title: "rescueSim: REpeated measures Single Cell RNA-seqUEncing data simulation"
+title: "rescueSim: REpeated measures Single Cell RNA-seqUEncing data SIMulation"
 output:
   html_document:
     toc: true
@@ -8,7 +8,7 @@ output:
     df_print: kable
 date: "`r format(Sys.Date(), '%B %d, %Y')`"
 vignette: >
-  %\VignetteIndexEntry{rescueSimVignette}
+  %\VignetteIndexEntry{Intro to rescueSim}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -27,16 +27,16 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-rescueSim is an R package for simulating single-cell RNA-sequencing
+`rescueSim` is an R package for simulating single-cell RNA-sequencing
 (scRNA-seq) data from repeated measures designs, such as longitudinal
 studies. One benefit of these types of studies is they allow researchers
 to investigate changes in gene expression over time for a specific cell
 type. Realistic simulated data data can be used to evaluate analysis
 methods and assess power under a variety of settings.
 
-The rescueSim package uses a gamma-poisson framework to simulate data from
+The `rescueSim` package uses a gamma-poisson framework to simulate data from
 individual cell-types while mimicking important attributes of empirical
-data, between-sample variability (i.e. data from cells from the same
+data such as between-sample variability (i.e. data from cells from the same
 sample are correlated) and between-subject variability (i.e. data from
 samples from the same subject are correlated).
 
@@ -46,14 +46,14 @@ In this vignette, we outline:
 -   The basic workflow for simulating data
 -   How to generate and update an object for storing simulation
     parameters
--   How to estimate simulation parameters from a dataset
+-   How to estimate simulation parameters from a data set
 -   How to simulate data using simulation parameters
 -   The effect of adjusting some of the simulation parameters on the
     simulated data
 
 # Installation
 
-rescueSim is available on github at: <https://github.com/ewynn610/rescueSim>.
+`rescueSim` is available on github at: <https://github.com/ewynn610/rescueSim>.
 
 It can be installed using:
 
@@ -66,7 +66,7 @@ devtools::install_github("https://github.com/ewynn610/rescueSim")
 
 # Simulation Overview
 
-rescueSim simulates a data set for a *single* cell type with gene
+`rescueSim` simulates a data set for a *single* cell type with gene
 expression counts for cells from several samples, with multiple samples
 coming from individual subjects. If a user wants data from several cell
 types, this process can be repeated to generate data for each cell type
@@ -74,10 +74,10 @@ of interest.
 
 The simulation process can be broken up into three steps (Figure 1):
 
-1.  Simulate sample-specific mean expression values for each, with
+1.  Simulate sample-specific mean expression values for each gene, with
     values for samples from the same subject having an extra level of
     correlation.
-2.  Draw "true" expression values for each cell using the
+2.  Draw cell-level "true" expression values for each gene using the
     sample-specific values.
 3.  Simulate final count values for each cell with added variability
     representing technical effects.
@@ -88,11 +88,11 @@ As seen in the left hand side of Figure 1, the simulation framework
 relies on a series of parameters. These can be estimated from a data set
 provided by the user or supplied manually by the user. Alternatively,
 predefined parameter values which were estimated from a longitudinal
-scRNA-Seq dataset of bronchoalveolar lavage samples from healthy adult
+scRNA-Seq data set of bronchoalveolar lavage samples from healthy adult
 subjects are included in the package. Users can use a combination of
 predefined or supplied parameters and parameters estimated from
 empirical data. This is particularly useful in situations where
-multi-sample/multi-timepoint data is not available in which case some,
+multi-sample/multi-time point data is not available in which case some,
 but not all, simulation parameters can be estimated from the empirical
 data.
 
@@ -114,10 +114,10 @@ Throughout the following example we will use gene expression data for
 recruited airspace macrophage cells from bronchoalveolar lavage samples
 samples collected from healthy adults. The data has been subset to
 contain gene expression for 1940 genes from 976 cells. Data was
-collected from five subjects at two timepoints per subject.
+collected from five subjects at two time points per subject.
 
 ```{r}
-## Load neccessary packages
+## Load necessary packages
 library(rescueSim)
 library(SingleCellExperiment)
 
@@ -142,11 +142,11 @@ unique(RecAM_sce$subjectID)
 ## Ten samples (two per subject)
 unique(RecAM_sce$sampleID)
 
-## Two different timepoints
+## Two different time points
 unique(RecAM_sce$time)
 ```
 
-We'll begin with a smaller dataset of just 40 genes to show the basic
+We'll begin with a smaller data set of just 40 genes to show the basic
 structure of the package.
 
 ```{r}
@@ -174,28 +174,29 @@ myParams
 We can see that the object contains slots for a variety of parameters
 which are empty by default. These slots represent the parameters in the
 left hand side of figure 1 used to simulate the data as well as other
-data properties such as the number of timepoints or subjects.
+data properties such as the number of time points or subjects.
 
 The table below gives an details about the simulation parameters.
 
 |     Parameter      | Symbol in Fig. 1 (if applicable) |                                                                                                   Description                                                                                                    |                                                                                                                                                                         Acceptable Values                                                                                                                                                                          |
 |:------------------:|:--------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-|   `nTimepoints`    |                \-                |                                                                                 Number of timepoints (i.e. samples) per subject                                                                                  |                                                                      Single numeric value \>0 representing the number of timepoints for all subjects.                                                                     |
+|   `nTimepoints`    |                \-                |                                                                                 Number of time points (i.e. samples) per subject                                                                                  |                                                                      Single numeric value \>0 representing the number of time points for all subjects.                                                                     |
 |  `twoGroupDesign`  |                \-                |                                                            Logical value indicating whether to simulate two groups (ex. treatment and control group)                                                             |                                                                                                                                             Logical value with `TRUE` indicating that two groups should be simulated.                                                                                                                                              |
 |  `nSubjsPerGroup`  |                \-                |                                                   Number of subjects per group (if using two group design) or number of total subjects (if only single group)                                                    |                                                                                    A single numeric value \>0 indicating the number of subjects per group.                                                                                     |
-| `maxCellsPerSamp`  |                \-                |                                                       Maximum parameter used when drawing number of cells per sample from a discrete uniform distribution                                                        | A single numeric value \>0 indicating the maximum number of cells per sample, or a vector with length equal to the number of conditions (group/timepoint combinations) with each value representing the maximum for a single condition, or a vector with length equal to the number of total samples with each value representing the maximum for a single sample. |
-| `minCellsPerSamp`  |                \-                |                                                       Minimum parameter used when drawing number of cells per sample from a discrete uniform distribution                                                        | A single numeric value \>0 indicating the minimum number of cells per sample, or a vector with length equal to the number of conditions (group/timepoint combinations) with each value representing the minimum for a single condition, or a vector with length equal to the number of total samples with each value representing the minimum for a single sample. |
+| `maxCellsPerSamp`  |                \-                |                                                       Maximum parameter used when drawing number of cells per sample from a discrete uniform distribution                                                        | A single numeric value \>0 indicating the maximum number of cells per sample, or a vector with length equal to the number of conditions (group/time point combinations) with each value representing the maximum for a single condition, or a vector with length equal to the number of total samples with each value representing the maximum for a single sample. |
+| `minCellsPerSamp`  |                \-                |                                                       Minimum parameter used when drawing number of cells per sample from a discrete uniform distribution                                                        | A single numeric value \>0 indicating the minimum number of cells per sample, or a vector with length equal to the number of conditions (group/time point combinations) with each value representing the minimum for a single condition, or a vector with length equal to the number of total samples with each value representing the minimum for a single sample. |
 |    `logLibMean`    |             $\mu_L$              |                                                        Mean library size (log scale) parameter. Used to draw library size from a log-normal distribution.                                                        |                                                                                                                                                A single value \>0 indicating the mean library size on a log scale.                                                                                                                                                 |
 |     `logLibSD`     |            $\sigma_L$            |                                                 Library size standard deviation (log scale) parameter. Used to draw library size from a log-normal distribution.                                                 |                                                                                                                                       A single value \>=0 indicating the standard deviation of library size on a log scale.                                                                                                                                        |
+| `customLibSizes`   |                \-                | Optional user-provided library sizes on the original (non-log) scale. If provided, library sizes will be drawn from this vector (with replacement) rather than simulated from a log-normal distribution. | A numeric vector of positive values representing library sizes on the original scale. If `NULL` (default), library sizes are drawn from the specified log-normal distribution using `logLibMean` and `logLibSD`. |
 |   `logLibFacVar`   |            $\alpha_d$            | Variance used for drawing sample-level multiplicative factors which give different library size distributions for each sample. Larger values result in larger variation in library size distributions by sample. |                                                                                                                                  A single value \>=0 with 0 indicating no difference in the library size distributions by sample.                                                                                                                                  |
-|    `exprsMean`     |             $\mu_g$              |                                                       Gene-specific mean expression value representing the average expression of each gene in the dataset.                                                       |                                                                                               Vector of numeric values \>=0 with length equal to desired number of genes in the simulated data where each value indicates the average expression for a single gene.                                                                                                |
-|    `dispersion`    |             $\phi_g$             |                                                      Gene-specific dispersion value representing the variation in expression for each gene in the dataset.                                                       |                                                                                                    Vector of numeric values \>0 with length equal to desired number of genes in the simulated data where each value indicates the dispersion for a single gene.                                                                                                    |
+|    `exprsMean`     |             $\mu_g$              |                                                       Gene-specific mean expression value representing the average expression of each gene in the data set. If a named vector is given, these names will be used as the gene names in the simulated `SingleCellExperiment` object.                                                  |                                                                                               Vector of numeric values \>=0 with length equal to desired number of genes in the simulated data where each value indicates the average expression for a single gene.                                                                                                |
+|    `dispersion`    |             $\phi_g$             |                                                      Gene-specific dispersion value representing the variation in expression for each gene in the data set.                                                       |                                                                                                    Vector of numeric values \>0 with length equal to desired number of genes in the simulated data where each value indicates the dispersion for a single gene.                                                                                                    |
 | `sampleFacVarMean` |             $\mu_b$              |                                    Mean used for drawing variance (log-scale) of sample-level multiplicative factors. Larger values result in more between-sample variation.                                     |                                                                                                                                                                      A single numeric value.                                                                                                                                                                       |
 |  `sampleFacVarSD`  |            $\sigma_b$            |      Standard deviation used for drawing variance (log-scale) of sample-level multiplicative factors. Larger values result in more variation in amount of between-sample variation across different genes.       |                                                                                                                                                                    A single numeric value \>=0.                                                                                                                                                                    |
 |  `subjectVarMean`  |             $\mu_a$              |                                  Mean used for drawing variance (log-scale) of subject-level multiplicative factors. Larger values result in larger between-subject variation.                                   |                                                                                                                                                                      A single numeric value.                                                                                                                                                                       |
 | `subjectFacVarSD`  |            $\sigma_a$            |     Standard deviation used for drawing variance (log-scale) of subject-level multiplicative factors. Larger values result in more variation in amount of between-subject variation across different genes.      |                                                                                                                                                                    A single numeric value \>=0.                                                                                                                                                                    |
-|      `propDE`      |                \-                |                                                                     Proportion of genes differentially expressed between timepoints/groups.                                                                      |                                                                                                                                                                   Numeric value between 0 and 1.                                                                                                                                                                   |
-|     `deLogFC`      |                \-                |                                                                           Fold change values used for differentially expressed genes.                                                                            |                                           A single numeric value \>=0 indicating the positive log-fold change for differentially expressed genes (log$_2$ fold change values will be simulated evenly to be positive or negative) or a vector of values (positive of negative) to draw log$_2$ fold change values from.                                            |
+|      `propDE`      |                \-                |                                                                     Proportion of genes differentially expressed between time points/groups.                                                                      |                                                                                                                                                                   Numeric value between 0 and 1.                                                                                                                                                                   |
+|     `deLog2FC`      |                \-                |                                                                           Fold change values used for differentially expressed genes.                                                                            |                                           A single numeric value \>=0 indicating the positive log-fold change for differentially expressed genes (assigned positive or negative at random); a vector of values (positive and negative) to draw DE log$_2$ fold change values from; a named list of log$_2$ fold change values for all genes in each condition relative to the reference condition (e.g., `time0`, `group0`, `time0_group0`). The reference condition should not be included in the list.                                            |
 
 Individual parameter values can be extracted using the `getRescueSimParam`
 function.
@@ -237,32 +238,32 @@ getRescueSimParam(myParams, "nSubjsPerGroup")
 
 ### Estimating parameter values from empirical data
 
-Parameters can be estimated from empirical datasets using the
-`estRescueSimParams` function. Users provide a dataset in the form of a
+Parameters can be estimated from empirical data sets using the
+`estRescueSimParams` function. Users provide a data set in the form of a
 `SingleCellExperiment` object with a counts matrix in the `counts` slot
-and sample, subject, timepoint, and group meta data (where applicable)
+and sample, subject, time point, and group meta data (where applicable)
 in `colData`. The table below outlines other function arguments.
 
 |        Argument         | Description                                                                                                                                                                                                                                                                                             | Default |
 |:-----------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
 |          `sce`          | `SingleCellExperiment` object containing empirical data with a counts matrix in the `counts` slot.                                                                                                                                                                                                      |   \-    |
 |       `paramObj`        | `RescueSimParams` object with empty slots for parameters which need to be estimated. If `NULL`, all parameter values will be estimated.                                                                                                                                                                    | `NULL`  |
-|    `sampleVariable`     | String denoting name of sample identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, data is assumed to contain only one sample parameters `logLibFacVar`, `sampleFacVarMean`, `sampleFacVarSD`, `subjectFacVarMean`, and `subjectFacVarSD` parameters cannot be estimated. | `NULL`  |
-|    `subjectVariable`    | String denoting name of subject identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, parameters `nSubjsPerGroup`, `subjectFacVarMean`, and `subjectFacVarSD` parameters cannot be estimated.                                                                               | `NULL`  |
-|   `timepointVariable`   | String denoting name of timepoint identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, the number of timepoints for the simulated data is set to 2.                                                                                                                        | `NULL`  |
+|    `sampleVariable`     | String denoting name of sample identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, data is assumed to contain only one sample and parameters `sampleFacVarMean` and `sampleFacVarSD` parameters cannot be estimated. | `NULL`  |
+|    `subjectVariable`    | String denoting name of subject identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, the data is assumed to contain only one subject and parameters `nSubjsPerGroup`, `subjectFacVarMean`, and `subjectFacVarSD` parameters cannot be estimated.                                                                               | `NULL`  |
+|   `timepointVariable`   | String denoting name of time point identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, the number of time points for the simulated data is set to 1.                                                                                                                        | `NULL`  |
 |     `groupVariable`     | String denoting name of group identifier variable in the `colData` of `SingleCellExperiment` object. If `NULL`, a single group design is assumed.                                                                                                                                                       | `NULL`  |
-|        `nonDEGs`        | Vector containing names or row indices of genes to be used to estimate sample and subject factor parameters. Using genes that are differentially expressed across timepoints may lead to inaccurate estimates.                                                                                          | `NULL`  |
-| `cellParamsByCondition` | Logical value indicating whether `maxCellsPerSamp` and `minCellsPerSamp` should be estimated for each condition (group/timepoint) or overall.                                                                                                                                                           | `FALSE` |
+|        `nonDEGs`        | Vector containing names or row indices of genes to be used to estimate sample and subject factor parameters. Using genes that are differentially expressed across time points may lead to inaccurate estimates.                                                                                          | `NULL`  |
+| `cellParamsByCondition` | Logical value indicating whether `maxCellsPerSamp` and `minCellsPerSamp` should be estimated for each condition (group/time point) or overall.                                                                                                                                                           | `FALSE` |
 
-The below example shows how we can simulate dataset using the subsetted
+The below example shows how we can simulate data set using the subsetted
 recruited macrophage data. We estimate all of the parameters from the
 data and the empirical data has a single group, so providing a
-`paramObj` or`groupVariable` is unnecessary. In estimating subject and
-sample multiplicative factor parameters (`sampleFacVarMean`,
-`sampleFacVarSD`, `subjectFacVarMean`, and `subjectFacVarSD`). Using
-genes that are differentially expressed across timepoints may lead to
-inaccurate estimates. The recruited macrophage dataset only includes
-genes that appeared invariant across timepoints. In datasets where
+`paramObj` or`groupVariable` is unnecessary. Using
+genes that are differentially expressed across time points may lead to
+inaccurate estimates to inaccurate estimates of subject and
+sample variance parameters (`sampleFacVarMean`,
+`sampleFacVarSD`, `subjectFacVarMean`, and `subjectFacVarSD`). The recruited macrophage data set only includes
+genes that appeared invariant across time points. In data sets where
 differential expression is believed to be present, a rough list
 invariant genes can be identified using differential expression methods
 such as `edgeR` or `DESeq2` and the invariant genes can be passed to the
@@ -286,12 +287,12 @@ If you want to manually set some parameters before estimating others, a
 `RescueSimParams` object with blank slots for the parameters you would like
 estimated can be provided. Any parameters that already have values in
 the `RescueSimParams` object will not be estimated. This is particularly
-useful if using single-sample or single-timepoint empirical data. Below
-is an example of how data can be simulated using single-timepoint
+useful if using single-sample or single-time point empirical data. Below
+is an example of how data can be simulated using single-time point
 empirical data after manually setting some parameters.
 
 ```{r}
-## Subset the data to a single timepoint
+## Subset the data to a single time point
 RecAM_sce_single_time <- RecAM_sce_small[, RecAM_sce_small$time == "time0"]
 
 ## Create a params object with necessary parameters filled
@@ -312,18 +313,18 @@ parameters that we specified when creating the `RescueSimParams` object.
 myParams_estimated
 ```
 
-If `propDE` and `deLogFC` are not manually set, they are both set to 0
+If `propDE` and `deLog2FC` are not manually set, they are both set to 0
 (no differential expression).
 
 ```{r}
 getRescueSimParam(myParams_estimated, "propDE")
-getRescueSimParam(myParams_estimated, "deLogFC")
+getRescueSimParam(myParams_estimated, "deLog2FC")
 ```
 
 # Simulating Data
 
 After setting simulation parameters, the `simRescueData` function can be
-used to simulate a dataset. This function takes as an argument a
+used to simulate a data set. This function takes as an argument a
 `RescueSimParams` object. It returns a `SingleCellExperiment`.
 
 ```{r}
@@ -336,7 +337,7 @@ class(mySim)
 
 A matrix of counts is held the `counts` slot. The rownames (genes) take
 on the names of the `exprsMean` vector if provided. If `exprsMean` was
-estimated from empirical data, these are the genenames from the
+estimated from empirical data, these are the gene names from the
 empirical data.
 
 ```{r}
@@ -380,7 +381,7 @@ study planning is how the sample size will impact results. In these
 experiments, there are different aspects of sample size, all of which
 can be controlled in using the `rescueSim` simulation method:
 
--   Number of timepoints (samples) per subject (`nTimepoints`)
+-   Number of time points (samples) per subject (`nTimepoints`)
 
 -   Number of subjects (`nSubjsPerGroup`)
 
@@ -395,7 +396,7 @@ to be used for all samples, one `maxCellsPerSamp`and `maxCellsPerSamp`
 parameter for each condition (group/time), or one `maxCellsPerSamp`and
 `maxCellsPerSamp` parameter for each individual sample. Below is an
 example of estimating or manually specifying `maxCellsPerSamp`and
-`maxCellsPerSamp` parameters for the two timepoints.
+`maxCellsPerSamp` parameters for the two time points.
 
 A user can estimate individual parameters for each condition by using
 `cellParamsByCondition=TRUE` as a function argument.
@@ -418,7 +419,7 @@ myParams_cellsByCondition <- estRescueSimParams(RecAM_sce,
   cellParamsByCondition = T
 )
 
-## Now cell parameters are estimated separately by timepoint
+## Now cell parameters are estimated separately by time point
 getRescueSimParam(myParams_cellsByCondition, "maxCellsPerSamp")
 getRescueSimParam(myParams_cellsByCondition, "minCellsPerSamp")
 ```
@@ -451,9 +452,15 @@ table(simDat$sampleID, simDat$time)
 
 ## Library Size Adjustments
 
-The library sizes, or number of counts per cell, can be adjusted using
-three parameters: `logLibMean`, `logLibSD`, and `logLibFacVar`.
-
+The library sizes, or number of counts per cell, can be adjusted in two ways. 
+By default, library sizes are drawn from a log-normal distribution where 
+`logLibMean` the `logLibSD` control the overall mean and variability of library
+ sizes across cells. Alternatively, users can supply specific library sizes through 
+ the `customLibSizes` parameter from which library sizes are drawn directly rather than 
+ simulated from a distribution. In either case, `logLibFacVar` introduces variation 
+ in library size distributions between samples, mimicking technical effects such as 
+ batch variation. 
+  
 The `logLibMean` parameter controls the overall average library size
 (log scale). Below is an example of using a relatively large vs. small
 value for `logLibMean`.
@@ -512,6 +519,60 @@ libSizes <- rbind(bigLibSizeSD, smallLibSizeSD)
 
 ## Output boxplot comparing library sizes
 boxplot(log(libSizes) ~ type, data = libSizes, xlab = NULL, ylab = "log(Library Size)")
+```
+
+Alternatively, users can provide custom library sizes via the `customLibSizes` 
+parameter. When specified, these values are used directly (sampled with replacement)
+instead of drawing library sizes from a log-normal distribution. This can be useful in 
+cases where the log-normal distribution does not reflect the empirical distribution
+of library sizes.
+
+Below we illustrate how you could create custom library sizes based of an empirical
+distribution by identifying the sample in the data set with a mean library size closest to the
+overall mean across samples, and use that sample's library sizes for simulation.
+
+```{r}
+## Calculate library sizes for each cell
+empLibSizes <- data.frame(
+  libSizes = colSums(counts(RecAM_sce)),
+  sample = RecAM_sce$sampleID,
+  type="Empirical"
+)
+
+## Calculate mean library size for each sample
+samples <- unique(empLibSizes$sample)
+lib_size_means <- sapply(samples, function(s) {
+  mean(empLibSizes$libSizes[empLibSizes$sample == s])
+})
+
+## Find the sample closest to the overall mean
+overall_mean <- mean(lib_size_means)
+idx_min <- which.min(abs(lib_size_means - overall_mean))
+samp_min <- samples[idx_min]
+
+## Get custom library sizes from that sample
+customLibSizes <- empLibSizes$libSizes[empLibSizes$sample == samp_min]
+
+## Update parameters and simulate
+myParams_customLib <- updateRescueSimParams(myParams, list(customLibSizes = customLibSizes))
+simDat_customLib <- simRescueData(myParams_customLib)
+
+## Compare empirical and simulated library sizes
+
+simLibSizes <- data.frame(
+  libSizes = colSums(counts(simDat_customLib)),
+  sample=simDat_customLib$sampleID,
+  type = "Simulated (customLibSizes)"
+)
+
+libSizes <- rbind(empLibSizes, simLibSizes)
+
+## Boxplot comparing library sizes
+boxplot(log(libSizes) ~ type,
+        data=libSizes,
+        ylab = "log(Library Size)", xlab = NULL)
+
+
 ```
 
 In multi-sample scRNA-Seq data, there are often differences in the
@@ -666,26 +727,33 @@ scater::plotTSNE(simDat_bigsubjectFacVarMean, colour_by = "subjectID")
 ## Differential Expression
 
 `rescueSim` allows the user to simulate differential expression between
-timepoints/groups using two parameters which must be manually set by the
+time points/groups using two parameters which must be manually set by the
 user: `propDE` which controls the proportion of genes differentially
-expressed, and `deLogFC` which controls the log$_2$ fold change values
-of differentially expressed genes. If simulating multi-timepoint,
-multi-group data, differential expression is simulated between cells
-from the final timepoint/last group and the other timepoint/group
-combinations. If more than two timepoints are simulated, a linear change
-in gene expression across time is simulated with the differential
-expression between the first and last timepoints equal to the values
-specified by `deLogFC`. A user can specify one positive log$_2$ fold
-change value for the `deLogFC` in which case differential expression
-will be evenly split between up and down regulation using the specified
-value. Alternatively, a vector of values can be provided (positive of
-negative) to draw log-fold change values from.
+expressed, and `deLog2FC` which controls the log$_2$ fold change values
+of differentially expressed genes. A user can specify a single positive log$_2$ fold 
+change value for `deLog2FC`, in which case differential expression
+is evenly split between up- and down-regulation in the proportion of genes specified
+by `propDE`. Alternatively, a vector of positive and/or negative
+values can be provided, from which log$_2$ fold change values from differentially
+expressed genes are drawn. In both of these cases, when simulating multiple time points, 
+the log$_2$ fold change represents the change between the first (`time0`) and last 
+time point, with gene expression changes simulated linearly across intermediate
+time points. In a two-group, multi-time point simulation, the log$_2$ fold change
+represents the difference between `time0_group0` and the final time point of `group1`
+(`timeN_group1`), with no differential expression across time points within group0
+and a linear change across time within `group1`.
+
+Alternatively, users can provide a named list of vectors to `deLogFC` where each element
+of the list corresponds to the fold change values at each time point (or time point-group combination)
+relative to the baseline (`time0`, `group0`, or `time0_group0`). This enables simulation
+of non-linear or custom differential expression patterns across time and groups. 
+When using a list, the `propDE` parameter is not used and each vector should have length equal to the number of genes in the data set. The baseline condition is not included in the list.
 
 We show below using a TSNE plot from the `scater` package how
 differential expression impacts cell clustering.
 
 If we simulate with no differential expression, cells from both
-timepoints cluster together.
+time points cluster together.
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Estimate data with no differential expression (default)
@@ -701,17 +769,13 @@ scater::plotTSNE(simDat_noDE, colour_by = "time")
 ```
 
 If simulate 20% of genes to be differentially expressed between
-timepoints with a $\pm1$ log$_2$ fold change, cells from different
-timepoints cluster separately.
-
-If we simulate three timepoints, the cells cluster sequentially by
-timepoint since `rescueSim` simulates linear differential expression across
-time.
+time points with a $\pm1$ log$_2$ fold change, cells from different
+time points cluster separately.
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Manually changing DE Params
 myParams_de_2timepoints <- updateRescueSimParams(myParams, list(
-  propDE = .2, deLogFC = 1
+  propDE = .2, deLog2FC = 1
 ))
 
 ## Estimate data with no differential expression (default)
@@ -726,10 +790,14 @@ simDat_de_2timepoints <- scater::runTSNE(simDat_de_2timepoints)
 scater::plotTSNE(simDat_de_2timepoints, colour_by = "time")
 ```
 
+If we simulate three time points, the cells cluster sequentially by
+time point since `rescueSim` simulates linear differential expression across
+time.
+
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Manually changing DE Params
 myParams_de_3timepoints <- updateRescueSimParams(myParams, list(
-  propDE = .2, deLogFC = 1,
+  propDE = .2, deLog2FC = 1,
   nTimepoints = 3
 ))
 
@@ -745,15 +813,15 @@ simDat_de_3timepoints <- scater::runTSNE(simDat_de_3timepoints)
 scater::plotTSNE(simDat_de_3timepoints, colour_by = "time")
 ```
 
-If we simulate a 2-group, 2-timepoint dataset, then the cells from the
-final timepoint and last group, which is simulated to be differentially
+If we simulate a 2-group, 2-time point data set, then the cells from the
+final time point and last group, which is simulated to be differentially
 expressed relative to the other groups/times, cluster separately from
 the rest of the cells.
 
 ```{r fig.width=10, fig.height=6, dpi=50}
 ## Manually changing DE Params
 myParams_de_2groups <- updateRescueSimParams(myParams, list(
-  propDE = .2, deLogFC = 1,
+  propDE = .2, deLog2FC = 1,
   twoGroupDesign = T,
   nTimepoints = 2
 ))
@@ -775,6 +843,48 @@ simDat_de_2groups <- scater::runTSNE(simDat_de_2groups)
 
 scater::plotTSNE(simDat_de_2groups, colour_by = "group_time")
 ```
+
+Finally, we can simulate  differential expression using manually set log$_2$
+fold change values for each time point or condition, allowing for non-linear 
+changes across time. 
+This is done by providing `deLog2FC` as a list of named vectors, where each element
+of the list corresponds to a condition (excluding the reference: `time0`, `group0`
+or `time0_group0`). Each vector specifies the log$_2$ fold change values for each gene 
+in that condition relative to the reference group.
+
+Below, we show an example of simulating three time points, where we specify log$_2$ fold
+changes for one intermediate time point and larger log_$2$ fold changes for the final
+time point. This results in non-linear gene expression changes across time.
+
+```{r}
+
+## For the 2nd time point, simulate +/- 1 log2FC in 20% of genes
+time1_log2FC<-sample(c(-1, 0, 1), nrow(RecAM_sce), replace=T, prob = c(.1, .8, .1))
+
+## For final time point, multiply log2FC by 3 to get +/- 3 log2FC in 20% of genes
+time2_log2FC <- time1_log2FC*3
+
+myParams_nonLinearDE <- updateRescueSimParams(myParams, list(
+  deLog2FC = list(time1=time1_log2FC, time2=time2_log2FC),
+  nTimepoints = 3
+))
+
+simDat_nonLinearDE <- simRescueData(myParams_nonLinearDE)
+
+# Log-normalize counts and run TSNE
+simDat_nonLinearDE <- scater::logNormCounts(simDat_nonLinearDE)
+simDat_nonLinearDE <- scater::runTSNE(simDat_nonLinearDE)
+```
+
+In this case, we can see that the time0 and time1 are much closer together
+than to time2.
+```{r}
+# Plot TSNE colored by time point to visualize clustering
+scater::plotTSNE(simDat_nonLinearDE, colour_by = "time")
+
+```
+
+
 
 # Session Information
 

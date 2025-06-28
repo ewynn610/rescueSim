@@ -28,13 +28,12 @@ all parameter values will be estimated.}
 \item{sampleVariable}{String denoting name of sample identifier variable in
 the \code{colData} of \code{SingleCellExperiment} object. If \code{NULL},
 data is assumed to contain only one sample parameters
-\code{logLibFacVar}, \code{sampleFacVarMean}, \code{sampleFacVarSD},
-\code{subjectFacVarMean}, and \code{subjectFacVarSD} parameters
+ \code{sampleFacVarMean} and \code{sampleFacVarSD} parameters
 cannot be estimated.}
 
 \item{subjectVariable}{String denoting name of subject identifier variable in
 the \code{colData} of \code{SingleCellExperiment} object. If \code{NULL},
-parameters \code{nSubjsPerGroup}, \code{subjectFacVarMean}, and
+parameters \code{subjectFacVarMean} and
 \code{subjectFacVarSD} parameters cannot be estimated.}
 
 \item{groupVariable}{String denoting name of group identifier variable in
@@ -43,7 +42,7 @@ single group design is assumed.}
 
 \item{timepointVariable}{String denoting name of timepoint identifier
 variable in the \code{colData} of \code{SingleCellExperiment} object.
-If \code{NULL}, the number of timepoints for the simulated data is set to 2.}
+If \code{NULL}, the number of timepoints for the simulated data is set to 1.}
 
 \item{nonDEGs}{Vector containing names or row indices of genes to be used to
 estimate sample and subject factor parameters. Using genes that are
@@ -59,7 +58,7 @@ Estimate parameters to be used to simulate repeated measures scRNA-Seq data
 \details{
 All parameters in \code{\link{RescueSimParams-class}} object can be
 estimated/extracted from empirical data except \code{propDE} and
-\code{deLogFC} which are both set to 0 (no differential expression) if not
+\code{deLog2FC} which are both set to 0 (no differential expression) if not
 set manually. If a paramObj is provided, only parameters with empty slots in
 the object will be estimated.
 }

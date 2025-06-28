@@ -4,7 +4,7 @@
 \alias{RescueSimParams}
 \title{Generate RescueSimParams object}
 \usage{
-RescueSimParams(deLogFC = 0, propDE = 0, ...)
+RescueSimParams(deLog2FC = 0, propDE = 0, ...)
 }
 \arguments{
 \item{...}{Any parameter name followed by initial valus}

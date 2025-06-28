@@ -62,7 +62,9 @@ library size distributions by sample.}
 \item{\code{exprsMean}}{Gene-specific mean expression value representing the average
 expression of each gene in the dataset. Holds a vector of numeric values >=0
 with length equal to desired number of genes in the simulated data where each
-value indicates the average expression for a single gene.}
+value indicates the average expression for a single gene. If a named vector is given,
+these names will be used as the gene names in the simulated \code{SingleCellExperiment}
+object.}
 
 \item{\code{dispersion}}{Gene-specific dispersion value representing the variation in
 expression for each gene in the dataset. Holds a vector of numeric values >0
@@ -90,7 +92,7 @@ Must be a value >=0.}
 \item{\code{propDE}}{Proportion of genes differentially expressed between
 timepoints/groups. Must be a numeric value between 0 and 1.}
 
-\item{\code{deLogFC}}{Fold change values used for differentially expressed genes.
+\item{\code{deLog2FC}}{Fold change values used for differentially expressed genes.
 
 Specifies the log2 fold changes for differentially expressed (DE) genes.
 All values are interpreted as relative to a common baseline condition:

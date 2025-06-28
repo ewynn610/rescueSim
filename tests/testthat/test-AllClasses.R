@@ -6,7 +6,7 @@ fullParams <- RescueSimParams(
   subjectFacVarMean = 1, subjectFacVarSD = 1,
   nSubjsPerGroup = 1, twoGroupDesign = F,
   nTimepoints = 1, maxCellsPerSamp = 1, minCellsPerSamp = 1,
-  propDE = 0, deLogFC = 0
+  propDE = 0, deLog2FC = 0
 )
 
 test_that("getRescueSimParam working", {
@@ -24,7 +24,7 @@ test_that("updateRescueSimParams working", {
     subjectFacVarMean = 1, subjectFacVarSD = 1,
     nSubjsPerGroup = 1, twoGroupDesign = F,
     nTimepoints = 1, maxCellsPerSamp = 1, minCellsPerSamp = 1,
-    propDE = 0, deLogFC = 0
+    propDE = 0, deLog2FC = 0
   )
   expect_equal(updateRescueSimParams(blankParams, paramLS), fullParams)
 })
@@ -71,55 +71,55 @@ test_that(".checkGeneParamLengths working", {
                 nTimepoints=3,
                 exprsMean = c(1, 1),
                 dispersion = c(1,1),
-                deLogFC=list(time1 = c(1,1,1), time2=c(1,1,1))
+                deLog2FC=list(time1 = c(1,1,1), time2=c(1,1,1))
             )
         ),
-        "The lengths of the following logFC vectors do not match exprsMean: time1, time2"
+        "The lengths of the following Log2FC vectors do not match exprsMean: time1, time2"
     )
 })
 
-test_that("deLogFC: numeric values pass validation", {
-    expect_silent(updateRescueSimParams(fullParams, list(deLogFC = 1)))
-    expect_silent(updateRescueSimParams(fullParams, list(deLogFC = rnorm(3))))
+test_that("deLog2FC: numeric values pass validation", {
+    expect_silent(updateRescueSimParams(fullParams, list(deLog2FC = 1)))
+    expect_silent(updateRescueSimParams(fullParams, list(deLog2FC = rnorm(3))))
 })
 
-test_that("deLogFC: list with missing nTimepoints triggers error", {
+test_that("deLog2FC: list with missing nTimepoints triggers error", {
     broken <- fullParams
     methods::slot(broken, "nTimepoints") <- numeric(0)
-    expect_error(updateRescueSimParams(broken, list(deLogFC = list(time1 = rnorm(3)))),
+    expect_error(updateRescueSimParams(broken, list(deLog2FC = list(time1 = rnorm(3)))),
                  regexp = "must be specified")
 })
 
-test_that("deLogFC: one timepoint and one group triggers error", {
+test_that("deLog2FC: one timepoint and one group triggers error", {
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 1,
         twoGroupDesign = FALSE,
-        deLogFC = list(time1 = rnorm(3))
+        deLog2FC = list(time1 = rnorm(3))
     )), regexp = "DE cannot be defined")
 })
 
-test_that("deLogFC: one timepoint, two groups - group1 valid, group0 invalid", {
+test_that("deLog2FC: one timepoint, two groups - group1 valid, group0 invalid", {
     expect_silent(updateRescueSimParams(fullParams, list(
         nTimepoints = 1,
         twoGroupDesign = TRUE,
-        deLogFC = list(group1 = rnorm(3))
+        deLog2FC = list(group1 = rnorm(3))
     )))
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 1,
         twoGroupDesign = TRUE,
-        deLogFC = list(group0 = rnorm(3))
+        deLog2FC = list(group0 = rnorm(3))
     )), regexp = "group0.*reference level")
 })
 
-test_that("deLogFC: multi-timepoint, one group - time0 invalid", {
+test_that("deLog2FC: multi-timepoint, one group - time0 invalid", {
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
-        deLogFC = list(time0 = rnorm(3))
+        deLog2FC = list(time0 = rnorm(3))
     )), regexp = "time0.*reference level")
 })
 
-test_that("deLogFC: multi-timepoint, two groups - valid names only", {
+test_that("deLog2FC: multi-timepoint, two groups - valid names only", {
     good <- list(
         time1_group0 = rnorm(3),
         time1_group1 = rnorm(3),
@@ -129,7 +129,7 @@ test_that("deLogFC: multi-timepoint, two groups - valid names only", {
     expect_silent(updateRescueSimParams(fullParams, list(
         nTimepoints = 3,
         twoGroupDesign = TRUE,
-        deLogFC = good
+        deLog2FC = good
     )))
 
     bad <- good
@@ -137,38 +137,38 @@ test_that("deLogFC: multi-timepoint, two groups - valid names only", {
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 3,
         twoGroupDesign = TRUE,
-        deLogFC = bad
+        deLog2FC = bad
     )), regexp = "time0_group0.*reference level")
 })
 
-test_that("deLogFC: unnamed list triggers error", {
+test_that("deLog2FC: unnamed list triggers error", {
     unnamed <- list(rnorm(3), rnorm(3))
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
-        deLogFC = unnamed
+        deLog2FC = unnamed
     )), regexp = "must be named")
 })
 
-test_that("deLogFC: unexpected and missing names are caught", {
+test_that("deLog2FC: unexpected and missing names are caught", {
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
-        deLogFC = list(foo = rnorm(3))
+        deLog2FC = list(foo = rnorm(3))
     )), regexp = "Unexpected names")
 
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 3,
         twoGroupDesign = FALSE,
-        deLogFC = list(time1 = rnorm(3))  # missing time2
+        deLog2FC = list(time1 = rnorm(3))  # missing time2
     )), regexp = "Missing expected names")
 })
 
-test_that("deLogFC: non-numeric elements trigger error", {
+test_that("deLog2FC: non-numeric elements trigger error", {
     expect_error(updateRescueSimParams(fullParams, list(
         nTimepoints = 2,
         twoGroupDesign = FALSE,
-        deLogFC = list(time1 = "not numeric")
+        deLog2FC = list(time1 = "not numeric")
     )), regexp = "not numeric vectors")
 })
 

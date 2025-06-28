@@ -26,7 +26,7 @@ cells represented by columns.}
     }
 \item{\code{rowData}}{
   \describe{
-    \item{deLogFC}{A \code{DataFrame} containing log2 fold change information for each gene.
+    \item{deLog2FC}{A \code{DataFrame} containing log2 fold change information for each gene.
     Each column corresponds to a non-reference experimental condition
     (e.g., \code{"time1"}, \code{"group1"}, \code{"time1_group1"}, etc.), and values represent
     gene-level log2 fold changes relative to the baseline condition
@@ -41,8 +41,14 @@ cells represented by columns.}
 Simulate Repeated Measures scRNA-seq Data using the RESCUE method
 }
 \examples{
-# Read in parameter object
-data("RecAM_params")
+# Read in data
+ data("RecAM_sce")
+
+ # Calculate sim parameters for first 50 genes
+RecAM_sce <- RecAM_sce[1:50,]
+RecAM_params<-estRescueSimParams(RecAM_sce, sampleVariable = "sampleID",
+subjectVariable = "subjectID", timepointVariable = "time")
+
 
 # Simulate data
 simDat=simRescueData(RecAM_params)

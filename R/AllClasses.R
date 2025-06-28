@@ -45,7 +45,9 @@
 #' @slot exprsMean Gene-specific mean expression value representing the average
 #' expression of each gene in the dataset. Holds a vector of numeric values >=0
 #' with length equal to desired number of genes in the simulated data where each
-#' value indicates the average expression for a single gene.
+#' value indicates the average expression for a single gene. If a named vector is given,
+#' these names will be used as the gene names in the simulated \code{SingleCellExperiment}
+#' object.
 #' @slot dispersion Gene-specific dispersion value representing the variation in
 #' expression for each gene in the dataset. Holds a vector of numeric values >0
 #' with length equal to desired number of genes in the simulated data where each
@@ -66,7 +68,7 @@
 #' Must be a value >=0.
 #' @slot propDE Proportion of genes differentially expressed between
 #' timepoints/groups. Must be a numeric value between 0 and 1.
-#' @slot deLogFC Fold change values used for differentially expressed genes.
+#' @slot deLog2FC Fold change values used for differentially expressed genes.
 #'
 #' Specifies the log2 fold changes for differentially expressed (DE) genes.
 #' All values are interpreted as relative to a common baseline condition:
@@ -133,7 +135,7 @@ setClass("RescueSimParams",
              subjectFacVarMean = "numeric",
              subjectFacVarSD = "numeric",
              propDE = "numeric",
-             deLogFC = "ANY"
+             deLog2FC = "ANY"
          )
 )
 
@@ -155,8 +157,8 @@ setClass("RescueSimParams",
 #'
 #' @export
 
-RescueSimParams <- function(deLogFC = 0, propDE = 0, ...) {
-    obj <- methods::new("RescueSimParams",deLogFC = deLogFC, propDE = propDE,...)
+RescueSimParams <- function(deLog2FC = 0, propDE = 0, ...) {
+    obj <- methods::new("RescueSimParams",deLog2FC = deLog2FC, propDE = propDE,...)
     methods::validObject(obj)
     obj
 }
@@ -236,9 +238,9 @@ rescueSimParamsValidity <- function(object) {
     singleValueError <- .checkSingleValueParams(param_lengths)
 
     ## ExprsMean and dispersion
-    geneParamLengthError <- .checkGeneParamLengths(param_lengths, methods::slot(object, "deLogFC"))
+    geneParamLengthError <- .checkGeneParamLengths(param_lengths, methods::slot(object, "deLog2FC"))
 
-    deLogFCError<-.checkDeLogFCFormat(methods::slot(object, "deLogFC"),
+    deLog2FCError<-.checkDeLog2FCFormat(methods::slot(object, "deLog2FC"),
                                       methods::slot(object, "nTimepoints"),
                                       methods::slot(object, "twoGroupDesign"))
 
@@ -253,7 +255,7 @@ rescueSimParamsValidity <- function(object) {
     propDEError<-.checkPropDEUpperBound(methods::slot(object, "propDE"))
 
     error_string <- c(
-        singleValueError, deLogFCError,geneParamLengthError, cellsPerSampError,
+        singleValueError, deLog2FCError,geneParamLengthError, cellsPerSampError,
         propDEError
     )
 
@@ -385,18 +387,18 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
     return(LT0Error)
 }
 
-.checkDeLogFCFormat <- function(deLogFC, nTimepoints, twoGroupDesign) {
+.checkDeLog2FCFormat <- function(deLog2FC, nTimepoints, twoGroupDesign) {
 
     # CASE 1: single value or numeric vector
-    if (is.numeric(deLogFC)) {
+    if (is.numeric(deLog2FC)) {
         return(NULL)  # valid
     }
 
     # CASE 2: list of named vectors
     # CASE 3: list of named numeric vectors
-    if (is.list(deLogFC)) {
+    if (is.list(deLog2FC)) {
         if (length(nTimepoints) == 0 || length(twoGroupDesign) == 0) {
-            return("If deLogFC is a list, both nTimepoints and twoGroupDesign must be specified.")
+            return("If deLog2FC is a list, both nTimepoints and twoGroupDesign must be specified.")
         }
 
         if (nTimepoints == 1 && !twoGroupDesign) {
@@ -417,14 +419,14 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
             forbidden_name <- "time0_group0"
         }
 
-        provided_names <- names(deLogFC)
+        provided_names <- names(deLog2FC)
 
         if (is.null(provided_names)) {
-            return("If deLogFC is a list, all elements must be named.")
+            return("If deLog2FC is a list, all elements must be named.")
         }
 
         if (forbidden_name %in% provided_names) {
-            return(paste0("'", forbidden_name, "' should not be included in deLogFC; it is the reference level."))
+            return(paste0("'", forbidden_name, "' should not be included in deLog2FC; it is the reference level."))
         }
 
         # Check for unexpected or missing names
@@ -432,24 +434,24 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
         missing <- setdiff(expected_names, provided_names)
 
         if (length(unexpected) > 0) {
-            return(paste("Unexpected names in deLogFC list:", paste(unexpected, collapse = ", ")))
+            return(paste("Unexpected names in deLog2FC list:", paste(unexpected, collapse = ", ")))
         }
 
         if (length(missing) > 0) {
-            return(paste("Missing expected names in deLogFC list:", paste(missing, collapse = ", ")))
+            return(paste("Missing expected names in deLog2FC list:", paste(missing, collapse = ", ")))
         }
 
         # Check all elements are numeric vectors
-        bad_type <- names(deLogFC)[!vapply(deLogFC, is.numeric, logical(1))]
+        bad_type <- names(deLog2FC)[!vapply(deLog2FC, is.numeric, logical(1))]
         if (length(bad_type) > 0) {
-            return(paste("The following elements of deLogFC are not numeric vectors:",
+            return(paste("The following elements of deLog2FC are not numeric vectors:",
                          paste(bad_type, collapse = ", ")))
         }
 
         return(NULL)
     }
 
-    return("deLogFC must be NULL, a single numeric value, a numeric vector, or a named list of numeric vectors.")
+    return("deLog2FC must be NULL, a single numeric value, a numeric vector, or a named list of numeric vectors.")
 }
 
 .checkPropDEUpperBound <- function(propDE) {
@@ -461,7 +463,7 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
     return(NULL)
 }
 
-.checkGeneParamLengths <- function(param_lengths, deLogFC) {
+.checkGeneParamLengths <- function(param_lengths, deLog2FC) {
     errors <- character()
 
     # Check exprsMean and dispersion lengths
@@ -470,12 +472,12 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
         errors <- c(errors, "Parameters exprsMean and dispersion must be vectors of equal length")
     }
 
-    # Check deLogFC list element lengths (if it's a list)
-    if (is.list(deLogFC)) {
-        bad_lengths <- vapply(deLogFC, function(x) length(x) != param_lengths["exprsMean"], logical(1))
+    # Check deLog2FC list element lengths (if it's a list)
+    if (is.list(deLog2FC)) {
+        bad_lengths <- vapply(deLog2FC, function(x) length(x) != param_lengths["exprsMean"], logical(1))
         if (any(bad_lengths)) {
-            bad_keys <- names(deLogFC)[bad_lengths]
-            msg <- paste0("The lengths of the following logFC vectors do not match exprsMean: ",
+            bad_keys <- names(deLog2FC)[bad_lengths]
+            msg <- paste0("The lengths of the following Log2FC vectors do not match exprsMean: ",
                           paste(bad_keys, collapse = ", "))
             errors <- c(errors, msg)
         }
