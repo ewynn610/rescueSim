@@ -11,7 +11,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
   install.packages("BiocManager")
 }
 
-BiocManager::install(c("scater", "edgeR", "scran", "scater", "scuttle", "SingleCellExperiment"))
+BiocManager::install(c("scater", "edgeR", "scran", "scater", "scuttle", "SingleCellExperiment", "MAST"))
 
 ```
 
