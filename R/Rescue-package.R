@@ -12,6 +12,9 @@
 #' @importFrom edgeR estimateDisp
 #' @importFrom graphics boxplot
 #' @importFrom gtools rdirichlet
+#' @importFrom MAST FromMatrix
+#' @importFrom MAST zlm
+#' @importFrom MAST summary
 #' @importFrom Matrix colSums
 #' @importFrom Matrix rowMeans
 #' @importFrom Matrix rowSums
@@ -26,7 +29,7 @@
 #' @importFrom scater runTSNE
 #' @importFrom scran convertTo
 #' @importFrom scuttle computePooledFactors
-#' @importFrom SingleCellExperiment colData
+#' @importFrom SingleCellExperiment colData rowData
 #' @importFrom stats aggregate
 #' @importFrom stats model.matrix
 #' @importFrom stats rgamma
@@ -34,5 +37,7 @@
 #' @importFrom stats rpois
 #' @importFrom stats sd
 #' @importFrom stats var
+#' @importFrom stats quantile
+#' @importFrom utils strcapture
 ## usethis namespace: end
 NULL

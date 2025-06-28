@@ -55,7 +55,7 @@ subjectVariable = "subjectID", timepointVariable = "time")
 
 
 # Simulate data
-simDat=simRescueDataa(RecAM_params)
+simDat=simRescueData(RecAM_params)
 
 is_de <- isDEbetweenConditions(simDat, "time1", "time0")
 

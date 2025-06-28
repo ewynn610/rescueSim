@@ -109,7 +109,7 @@ runRescueSimPower <- function(baseParams, scenarios,
 
             sce <- simRescueData(updatedParams)
 
-            rd_cols <- colnames(SummarizedExperiment::rowData(sce))
+            rd_cols <- colnames(SingleCellExperiment::rowData(sce))
             expected_conds <- gsub("^deLog2FC\\.","" ,rd_cols)
 
             if(!is.null(conditions)){
@@ -137,7 +137,7 @@ runRescueSimPower <- function(baseParams, scenarios,
                     cond2 <- "group1"
                 } else if (all(grepl("^time\\d+_group\\d+$", expected_conds))) {
                     cond1 <- "time0_group0"
-                    split_cond <- do.call(rbind, strcapture("time(\\d+)_group(\\d+)",
+                    split_cond <- do.call(rbind, utils::strcapture("time(\\d+)_group(\\d+)",
                                                             expected_conds,
                                                             list(time = integer(), group = integer())))
                     max_time <- max(split_cond$time)
@@ -270,7 +270,7 @@ runRescueSimPower <- function(baseParams, scenarios,
 #'
 #'
 #' # Simulate data
-#' simDat=simRescueDataa(RecAM_params)
+#' simDat=simRescueData(RecAM_params)
 #'
 #' is_de <- isDEbetweenConditions(simDat, "time1", "time0")
 #'
@@ -279,7 +279,7 @@ runRescueSimPower <- function(baseParams, scenarios,
 
 
 isDEbetweenConditions <- function(sce, condition1, condition2) {
-    rd <- SummarizedExperiment::rowData(sce)
+    rd <- SingleCellExperiment::rowData(sce)
     rd_names <- colnames(rd)
 
     # Helper to check if a condition is the reference

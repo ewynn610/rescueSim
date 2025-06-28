@@ -18,7 +18,8 @@ Imports:
     scran,
     scuttle,
     SingleCellExperiment,
-    stats
+    stats,
+    utils
 Suggests: 
     knitr,
     rmarkdown,

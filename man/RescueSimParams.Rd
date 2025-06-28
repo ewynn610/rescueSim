@@ -7,7 +7,11 @@
 RescueSimParams(deLog2FC = 0, propDE = 0, ...)
 }
 \arguments{
-\item{...}{Any parameter name followed by initial valus}
+\item{deLog2FC}{Initial value for deLog2FC param. Default is 0 (no differential expression).}
+
+\item{propDE}{Initial value for propDE param. Default is 0 (no differentialy expressed genes).}
+
+\item{...}{Any other parameter name followed by initial valus}
 }
 \value{
 An object of class \code{RescueSimParams}

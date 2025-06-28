@@ -144,7 +144,9 @@ setClass("RescueSimParams",
 #'
 #' @return An object of class \code{RescueSimParams}
 #'
-#' @param ... Any parameter name followed by initial valus
+#' @param deLog2FC Initial value for deLog2FC param. Default is 0 (no differential expression).
+#' @param propDE Initial value for propDE param. Default is 0 (no differentialy expressed genes).
+#' @param ... Any other parameter name followed by initial valus
 #'
 #' @author Elizabeth Wynn
 #'

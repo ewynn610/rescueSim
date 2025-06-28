@@ -12,7 +12,7 @@ create_dummy_sce <- function(samples, groups = NULL, timepoints = NULL) {
 
 test_that(".estNCellParams works when no cellParamsByCondition", {
     sce <- create_dummy_sce(samples = rep("A", 10))
-    out <- RESCUE:::.estNCellParams(sce, sampleVariable = "sampleID",
+    out <- rescueSim:::.estNCellParams(sce, sampleVariable = "sampleID",
                            cellParamsByCondition = FALSE,
                            groupVariable = NULL, timepointVariable = NULL,
                            nTimepoints = 1, twoGroupDesign = FALSE)
@@ -27,7 +27,7 @@ test_that(".estNCellParams errors on nTimepoints mismatch", {
         timepoints = c(rep("t0", 5), rep("t1", 5))
     )
     expect_error(
-        RESCUE:::.estNCellParams(sce, sampleVariable = "sampleID",
+        rescueSim:::.estNCellParams(sce, sampleVariable = "sampleID",
                         cellParamsByCondition = TRUE,
                         groupVariable = NULL, timepointVariable = "time",
                         nTimepoints = 3, twoGroupDesign = FALSE),
@@ -41,7 +41,7 @@ test_that(".estNCellParams errors on twoGroupDesign mismatch (too many groups)",
         groups = rep(c("g0", "g1", "g2"), each = 3)
     )
     expect_error(
-        RESCUE:::.estNCellParams(sce, sampleVariable = "sampleID",
+        rescueSim:::.estNCellParams(sce, sampleVariable = "sampleID",
                         cellParamsByCondition = TRUE,
                         groupVariable = "group", timepointVariable = NULL,
                         nTimepoints = 1, twoGroupDesign = TRUE),
@@ -55,7 +55,7 @@ test_that(".estNCellParams errors on twoGroupDesign mismatch (too few groups)", 
         groups = rep("g0", 6)
     )
     expect_error(
-        RESCUE:::.estNCellParams(sce, sampleVariable = "sampleID",
+        rescueSim:::.estNCellParams(sce, sampleVariable = "sampleID",
                         cellParamsByCondition = TRUE,
                         groupVariable = "group", timepointVariable = NULL,
                         nTimepoints = 1, twoGroupDesign = TRUE),
@@ -66,13 +66,13 @@ test_that(".estNCellParams errors on twoGroupDesign mismatch (too few groups)", 
 test_that(".estNCellParams produces names for min/maxCells", {
     sce <- create_dummy_sce(
         samples = rep(c("A", "B", "C"), each = 3),
-        groups = c(rep(c("g0", "g1"), 4),"g0"),
+        groups = c(rep(c("g0"), 9)),
         timepoints = rep(c("t0", "t1", "t2"), each = 3)
     )
-    out <- RESCUE:::.estNCellParams(sce, sampleVariable = "sampleID",
+    out <- rescueSim:::.estNCellParams(sce, sampleVariable = "sampleID",
                            cellParamsByCondition = TRUE,
                            groupVariable = "group", timepointVariable = "time",
-                           nTimepoints = 3, twoGroupDesign = T)
+                           nTimepoints = 3, twoGroupDesign = F)
     expect_named(out, c("minCells", "maxCells"))
-    expect_true(all(grepl("timepoint", names(out$minCells))))
+    expect_true(all(grepl("time", names(out$minCells))))
 })

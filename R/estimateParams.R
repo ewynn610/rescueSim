@@ -579,8 +579,8 @@ estRescueSimParams <- function(sce, paramObj = NULL,
             minCells <- maxCells <- ncol(sce)
         } else {
             num_cell_tab <- table(sce[[sampleVariable]])
-            minCells <- unname(round(quantile(num_cell_tab, .1)))
-            maxCells <- unname(round(quantile(num_cell_tab, .9)))
+            minCells <- unname(round(stats::quantile(num_cell_tab, .1)))
+            maxCells <- unname(round(stats::quantile(num_cell_tab, .9)))
         }
     } else {
         ## ----- Consistency checks -----
@@ -616,8 +616,8 @@ estRescueSimParams <- function(sce, paramObj = NULL,
         } else if (is.null(groupVariable)) {
             groupVariable <- sce[[timepointVariable]]
             num_cell_tab <- table(sce[[sampleVariable]], groupVariable)
-            minCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .1)))
-            maxCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .9)))
+            minCells <- apply(num_cell_tab, 2, function(x) round(stats::quantile(x[x != 0], .1)))
+            maxCells <- apply(num_cell_tab, 2, function(x) round(stats::quantile(x[x != 0], .9)))
             if (twoGroupDesign) {
                 minCells <- rep(minCells, 2)
                 maxCells <- rep(maxCells, 2)
@@ -625,8 +625,8 @@ estRescueSimParams <- function(sce, paramObj = NULL,
         } else if (is.null(timepointVariable)) {
             groupVariable <- sce[[groupVariable]]
             num_cell_tab <- table(sce[[sampleVariable]], groupVariable)
-            minCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .1)))
-            maxCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .9)))
+            minCells <- apply(num_cell_tab, 2, function(x) round(stats::quantile(x[x != 0], .1)))
+            maxCells <- apply(num_cell_tab, 2, function(x) round(stats::quantile(x[x != 0], .9)))
             if (nTimepoints > 1) {
                 minCells <- rep(minCells, each = nTimepoints)
                 maxCells <- rep(maxCells, each = nTimepoints)
@@ -638,8 +638,8 @@ estRescueSimParams <- function(sce, paramObj = NULL,
             )
             #groupVariable <- sce[[groupVariable]]
             num_cell_tab <- table(sce[[sampleVariable]], groupVariable)
-            minCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .1)))
-            maxCells <- apply(num_cell_tab, 2, function(x) round(quantile(x[x != 0], .9)))
+            minCells <- apply(num_cell_tab, 2, function(x) round(stats::quantile(x[x != 0], .1)))
+            maxCells <- apply(num_cell_tab, 2, function(x) round(stats::quantile(x[x != 0], .9)))
         }
         group_df <- expand.grid(
             group = paste0(
