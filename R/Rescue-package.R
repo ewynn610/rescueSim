@@ -38,6 +38,7 @@
 #' @importFrom stats sd
 #' @importFrom stats var
 #' @importFrom stats quantile
+#' @importFrom SummarizedExperiment assay
 #' @importFrom utils strcapture
 ## usethis namespace: end
 NULL

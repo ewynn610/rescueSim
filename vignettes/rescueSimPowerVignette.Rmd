@@ -114,7 +114,7 @@ deFun <- function(sce) {
                                              colData(sce)))
     
     # Calculate cellular detection rate
-    cdr <- colSums(SingleCellExperiment::assay(sca) > 0)
+    cdr <- colSums(SummarizedExperiment::assay(sca) > 0)
     colData(sca)$cngeneson <- scale(cdr)
     
     # Fit model

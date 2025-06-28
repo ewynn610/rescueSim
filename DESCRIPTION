@@ -18,6 +18,7 @@ Imports:
     scran,
     scuttle,
     SingleCellExperiment,
+    SummarizedExperiment,
     stats,
     utils
 Suggests: 
