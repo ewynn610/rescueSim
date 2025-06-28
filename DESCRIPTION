@@ -13,6 +13,8 @@ Imports:
     gtools,
     Matrix,
     methods,
+    scater,
+    MAST,
     scran,
     scuttle,
     SingleCellExperiment,
@@ -20,8 +22,6 @@ Imports:
 Suggests: 
     knitr,
     rmarkdown,
-    scater,
-    MAST,
     testthat (>= 3.0.0)
 VignetteBuilder: 
     knitr
