@@ -138,7 +138,7 @@ deFun <- function(sce) {
     )
     sum_tab <- data.frame(raw_res$datatable)
     
-    # Keep only the H (hypothesis) component rows
+    # Keep only the H (hurdle) component rows
     sum_tab <- sum_tab[sum_tab$component == "H", ]
     
     # Add padj and gene columns
