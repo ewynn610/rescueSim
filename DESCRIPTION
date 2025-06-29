@@ -4,7 +4,7 @@ Title: Repeated Measures Single Cell RNA-sequencing Data Simulation
 Version: 0.99.0
 Authors@R: c(person("Elizabeth", "Wynn",role = c("aut", "cre"), email = "wynne@njhealth.org"))
 Description: A package for simulating data from repeated measures scRNA-seq studies.
-License: GPL-3
+License: MIT + file LICENSE
 Imports: 
     checkmate,
     dplyr,
