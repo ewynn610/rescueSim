@@ -2,3 +2,8 @@ url: https://ewynn610.github.io/rescueSim/
 template:
   bootstrap: 5
 
+articles:
+  - title: "Introduction to rescueSim"
+    contents: rescueSimVignette
+  - title: "Power analysis with rescueSim"
+    contents: rescueSimPowerVignette
