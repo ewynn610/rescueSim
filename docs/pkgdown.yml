@@ -4,4 +4,7 @@ pkgdown_sha: ~
 articles:
   rescueSimVignette: rescueSimVignette.html
   rescueSimPowerVignette: rescueSimPowerVignette.html
-last_built: 2025-06-30T14:41Z
+last_built: 2025-06-30T14:54Z
+urls:
+  reference: https://ewynn610.github.io/rescueSim/reference
+  article: https://ewynn610.github.io/rescueSim/articles
