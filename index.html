@@ -55,24 +55,30 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="rescuesim-repeated-measures-single-cell-rna-sequencing-data-simulation">rescueSim: Repeated measures single cell RNA-sequencing data simulation<a class="anchor" aria-label="anchor" href="#rescuesim-repeated-measures-single-cell-rna-sequencing-data-simulation"></a>
 </h1></div>
+<p><strong>rescueSim</strong> is an R package for simulating repeated measures (paired/longitudinal) single-cell RNA-sequencing (scRNA-seq) data.<br>
+It is designed to support power analysis, benchmarking, and method development for studies involving complex scRNA-seq designs.</p>
 <div class="section level2">
 <h2 id="getting-started">Getting started<a class="anchor" aria-label="anchor" href="#getting-started"></a>
 </h2>
-<p>rescueSim is a package for simulating repeated measures scRNA-Seq data. To install the package, start by ensuring all dependencie sare installed: ```{r} ## Install CRAN dependencies install.packages(c(“checkmate”, “dplyr”, “gtools”, “Matrix”))</p>
+<div class="section level3">
+<h3 id="install-dependencies">Install dependencies<a class="anchor" aria-label="anchor" href="#install-dependencies"></a>
+</h3>
+<p>```{r} ## CRAN packages install.packages(c(“checkmate”, “dplyr”, “gtools”, “Matrix”))</p>
+</div>
 </div>
 <div class="section level2">
-<h2 id="install-bioconductor-dependencies">Install bioconductor dependencies<a class="anchor" aria-label="anchor" href="#install-bioconductor-dependencies"></a>
+<h2 id="bioconductor-packages">Bioconductor packages<a class="anchor" aria-label="anchor" href="#bioconductor-packages"></a>
 </h2>
 <p>if (!requireNamespace(“BiocManager”, quietly = TRUE)) { install.packages(“BiocManager”) }</p>
 <p>BiocManager::install(c(“scater”, “edgeR”, “scran”, “scater”, “scuttle”, “SingleCellExperiment”, “MAST”))</p>
-<pre><code>
-The rescueSim package can be installed from github using the following code:
+<pre><code>### Install rescueSim from GitHub
+**Note:** The package vignettes are available on the package website. If you'd prefer to build the vignettes locally during installation, you can set `build_vignettes = TRUE`, though this may take longer.
+
 ```{r}
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
-devtools::install_github("https://github.com/ewynn610/rescueSim",  build_vignettes = T)</code></pre>
-<p>Once the package is installed, to access a vignette introducing the package workflow use: <code>{r} vignette("rescueSimVignette")</code></p>
+devtools::install_github("https://github.com/ewynn610/rescueSim",  build_vignettes = FALSE)</code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
