@@ -4,6 +4,7 @@
 It is designed to support power analysis, benchmarking, and method development for studies involving complex scRNA-seq designs.
 
 **Website:** [rescueSim website](https://ewynn610.github.io/rescueSim/)
+
 **Vignettes:**
 - [Introduction to rescueSim](https://ewynn610.github.io/rescueSim/articles/rescueSimVignette.html)
 - [Power analysis with rescueSim](https://ewynn610.github.io/rescueSim/articles/rescueSimPowerVignette.html)
