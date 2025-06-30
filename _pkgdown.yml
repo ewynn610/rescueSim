@@ -3,7 +3,7 @@ template:
   bootstrap: 5
 
 articles:
-  - title: "Introduction to rescueSim"
-    contents: rescueSimVignette
-  - title: "Power analysis with rescueSim"
-    contents: rescueSimPowerVignette
+  - title: "Articles"
+    contents:
+      - rescueSimVignette
+      - rescueSimPowerVignette
