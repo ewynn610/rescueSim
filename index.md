@@ -13,7 +13,7 @@ It is designed to support power analysis, benchmarking, and method development f
 
 ### Install dependencies
 
-```{r}
+```r
 ## CRAN packages
 install.packages(c("checkmate", "dplyr", "gtools", "Matrix", "lme4"))
 
@@ -27,7 +27,7 @@ BiocManager::install(c("scater", "edgeR", "scran", "scater", "scuttle", "SingleC
 ### Install rescueSim from GitHub
 **Note:** The package vignettes are available on the package website. If you'd prefer to build the vignettes locally during installation, you can set `build_vignettes = TRUE`, though this may take longer.
 
-```{r}
+```r
 if (!requireNamespace("devtools", quietly = TRUE)) {
   install.packages("devtools")
 }
