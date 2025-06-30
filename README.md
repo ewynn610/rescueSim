@@ -14,7 +14,7 @@ It is designed to support power analysis, benchmarking, and method development f
 
 ```{r}
 ## CRAN packages
-install.packages(c("checkmate", "dplyr", "gtools", "Matrix"))
+install.packages(c("checkmate", "dplyr", "gtools", "Matrix", "lme4"))
 
 ## Bioconductor packages
 if (!requireNamespace("BiocManager", quietly = TRUE)) {

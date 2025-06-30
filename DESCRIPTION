@@ -20,7 +20,8 @@ Imports:
     SingleCellExperiment,
     SummarizedExperiment,
     stats,
-    utils
+    utils,
+    lme4
 Suggests: 
     knitr,
     rmarkdown,

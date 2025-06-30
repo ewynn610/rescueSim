@@ -20,8 +20,8 @@ editor_options:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  message = TRUE,
-  warning = TRUE
+  message = FALSE,
+  warning = FALSE
 )
 ```
 
@@ -161,7 +161,7 @@ For simplicity, we will set the `minCellsPerSamp` and `maxCellsPerSamp` paramete
 
 In practice, simulations like these could be used to explore trade-offs between sequencing depth and subject recruitment. For illustration purposes here, we will simulate only 2 data sets per scenario and are using a very small number of genes, so the results produced  are not meaningful and cannot be used to reflect method performance or guide study design. The goal is simply to demonstrate how the `runRescueSimPower` function can be applied.
 
-```{r}
+```{r, message=T, warning=T}
 ## Update differential expression parameters in parameter object
 simParams <- updateRescueSimParams(simParams, 
                                    paramValues = list(propDE=.2, deLog2FC=.5))

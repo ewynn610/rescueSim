@@ -12,6 +12,7 @@ A package for simulating data from repeated measures scRNA-seq studies.
 Useful links:
 \itemize{
   \item \url{https://github.com/ewynn610/rescueSim}
+  \item \url{https://ewynn610.github.io/rescueSim/}
   \item Report bugs at \url{https://github.com/ewynn610/rescueSim/issues}
 }
 
