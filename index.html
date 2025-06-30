@@ -72,22 +72,27 @@ It is designed to support power analysis, benchmarking, and method development f
 <div class="section level3">
 <h3 id="install-dependencies">Install dependencies<a class="anchor" aria-label="anchor" href="#install-dependencies"></a>
 </h3>
-<p>```{r} ## CRAN packages install.packages(c(“checkmate”, “dplyr”, “gtools”, “Matrix”, “lme4”))</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## CRAN packages</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"checkmate"</span>, <span class="st">"dplyr"</span>, <span class="st">"gtools"</span>, <span class="st">"Matrix"</span>, <span class="st">"lme4"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Bioconductor packages</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu">install</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scater"</span>, <span class="st">"edgeR"</span>, <span class="st">"scran"</span>, <span class="st">"scater"</span>, <span class="st">"scuttle"</span>, <span class="st">"SingleCellExperiment"</span>, <span class="st">"MAST"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level3">
+<h3 id="install-rescuesim-from-github">Install rescueSim from GitHub<a class="anchor" aria-label="anchor" href="#install-rescuesim-from-github"></a>
+</h3>
+<p><strong>Note:</strong> The package vignettes are available on the package website. If you’d prefer to build the vignettes locally during installation, you can set <code>build_vignettes = TRUE</code>, though this may take longer.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"devtools"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"https://github.com/ewynn610/rescueSim"</span>,  build_vignettes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="bioconductor-packages">Bioconductor packages<a class="anchor" aria-label="anchor" href="#bioconductor-packages"></a>
-</h2>
-<p>if (!requireNamespace(“BiocManager”, quietly = TRUE)) { install.packages(“BiocManager”) }</p>
-<p>BiocManager::install(c(“scater”, “edgeR”, “scran”, “scater”, “scuttle”, “SingleCellExperiment”, “MAST”))</p>
-<pre><code>### Install rescueSim from GitHub
-**Note:** The package vignettes are available on the package website. If you'd prefer to build the vignettes locally during installation, you can set `build_vignettes = TRUE`, though this may take longer.
-
-```{r}
-if (!requireNamespace("devtools", quietly = TRUE)) {
-  install.packages("devtools")
-}
-devtools::install_github("https://github.com/ewynn610/rescueSim",  build_vignettes = FALSE)</code></pre>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
