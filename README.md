@@ -12,7 +12,6 @@ if (!requireNamespace("BiocManager", quietly = TRUE)) {
 }
 
 BiocManager::install(c("scater", "edgeR", "scran", "scater", "scuttle", "SingleCellExperiment", "MAST"))
-
 ```
 
 The rescueSim package can be installed from github using the following code:
