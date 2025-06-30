@@ -207,76 +207,6 @@ illustrate the package functionality.</p>
 <code class="sourceCode R"><span><span class="co">## Load packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ewynn610/rescueSim" class="external-link">rescueSim</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SingleCellExperiment</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Loading required package: SummarizedExperiment</span></span>
-<span><span class="co">#&gt; Loading required package: MatrixGenerics</span></span>
-<span><span class="co">#&gt; Loading required package: matrixStats</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'MatrixGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:matrixStats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     colAlls, colAnyNAs, colAnys, colAvgsPerRowSet, colCollapse,</span></span>
-<span><span class="co">#&gt;     colCounts, colCummaxs, colCummins, colCumprods, colCumsums,</span></span>
-<span><span class="co">#&gt;     colDiffs, colIQRDiffs, colIQRs, colLogSumExps, colMadDiffs,</span></span>
-<span><span class="co">#&gt;     colMads, colMaxs, colMeans2, colMedians, colMins, colOrderStats,</span></span>
-<span><span class="co">#&gt;     colProds, colQuantiles, colRanges, colRanks, colSdDiffs, colSds,</span></span>
-<span><span class="co">#&gt;     colSums2, colTabulates, colVarDiffs, colVars, colWeightedMads,</span></span>
-<span><span class="co">#&gt;     colWeightedMeans, colWeightedMedians, colWeightedSds,</span></span>
-<span><span class="co">#&gt;     colWeightedVars, rowAlls, rowAnyNAs, rowAnys, rowAvgsPerColSet,</span></span>
-<span><span class="co">#&gt;     rowCollapse, rowCounts, rowCummaxs, rowCummins, rowCumprods,</span></span>
-<span><span class="co">#&gt;     rowCumsums, rowDiffs, rowIQRDiffs, rowIQRs, rowLogSumExps,</span></span>
-<span><span class="co">#&gt;     rowMadDiffs, rowMads, rowMaxs, rowMeans2, rowMedians, rowMins,</span></span>
-<span><span class="co">#&gt;     rowOrderStats, rowProds, rowQuantiles, rowRanges, rowRanks,</span></span>
-<span><span class="co">#&gt;     rowSdDiffs, rowSds, rowSums2, rowTabulates, rowVarDiffs, rowVars,</span></span>
-<span><span class="co">#&gt;     rowWeightedMads, rowWeightedMeans, rowWeightedMedians,</span></span>
-<span><span class="co">#&gt;     rowWeightedSds, rowWeightedVars</span></span>
-<span><span class="co">#&gt; Loading required package: GenomicRanges</span></span>
-<span><span class="co">#&gt; Loading required package: stats4</span></span>
-<span><span class="co">#&gt; Loading required package: BiocGenerics</span></span>
-<span><span class="co">#&gt; Loading required package: generics</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'generics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,</span></span>
-<span><span class="co">#&gt;     setequal, union</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'BiocGenerics'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     IQR, mad, sd, var, xtabs</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     anyDuplicated, aperm, append, as.data.frame, basename, cbind,</span></span>
-<span><span class="co">#&gt;     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,</span></span>
-<span><span class="co">#&gt;     get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,</span></span>
-<span><span class="co">#&gt;     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,</span></span>
-<span><span class="co">#&gt;     rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,</span></span>
-<span><span class="co">#&gt;     unsplit, which.max, which.min</span></span>
-<span><span class="co">#&gt; Loading required package: S4Vectors</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'S4Vectors'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:utils':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     findMatches</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     expand.grid, I, unname</span></span>
-<span><span class="co">#&gt; Loading required package: IRanges</span></span>
-<span><span class="co">#&gt; Loading required package: GenomeInfoDb</span></span>
-<span><span class="co">#&gt; Loading required package: Biobase</span></span>
-<span><span class="co">#&gt; Welcome to Bioconductor</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     Vignettes contain introductory material; view with</span></span>
-<span><span class="co">#&gt;     'browseVignettes()'. To cite Bioconductor, see</span></span>
-<span><span class="co">#&gt;     'citation("Biobase")', and for packages 'citation("pkgname")'.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'Biobase'</span></span>
-<span><span class="co">#&gt; The following object is masked from 'package:MatrixGenerics':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     rowMedians</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:matrixStats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     anyMissing, rowMedians</span></span>
 <span></span>
 <span><span class="co">## Load data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"RecAM_sce"</span><span class="op">)</span></span>
@@ -415,18 +345,12 @@ the <code>runRescueSimPower</code> function can be applied.</p>
 <span>                            deFunction <span class="op">=</span> <span class="va">deFun</span>, nSim <span class="op">=</span> <span class="fl">2</span>, returnFDR  <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Running scenario 1 of 2</span></span>
 <span><span class="co">#&gt;   Sim 1</span></span>
-<span><span class="co">#&gt; Warning in value[[3L]](cond): DE failed for scenario 1 sim 1: Please install</span></span>
-<span><span class="co">#&gt; `lme4` to use method `LMERlike`.</span></span>
 <span><span class="co">#&gt;   Sim 2</span></span>
-<span><span class="co">#&gt; Warning in value[[3L]](cond): DE failed for scenario 1 sim 2: Please install</span></span>
-<span><span class="co">#&gt; `lme4` to use method `LMERlike`.</span></span>
 <span><span class="co">#&gt; Running scenario 2 of 2</span></span>
 <span><span class="co">#&gt;   Sim 1</span></span>
-<span><span class="co">#&gt; Warning in value[[3L]](cond): DE failed for scenario 2 sim 1: Please install</span></span>
-<span><span class="co">#&gt; `lme4` to use method `LMERlike`.</span></span>
 <span><span class="co">#&gt;   Sim 2</span></span>
-<span><span class="co">#&gt; Warning in value[[3L]](cond): DE failed for scenario 2 sim 2: Please install</span></span>
-<span><span class="co">#&gt; `lme4` to use method `LMERlike`.</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning in runRescueSimPower(baseParams = simParams, scenarios = scenarios, :</span></span>
+<span><span class="co">#&gt; Some padj values are NA and will be removed before calculating power.</span></span></code></pre></div>
 <p>The output of <code>runRescueSimPower</code> is a data frame where
 each row corresponds to one simulated data set, showing the scenario
 settings, simulation number, comparison conditions, power, and (if
@@ -434,7 +358,16 @@ requested) FDR. Again, with so few genes and simulations here, the
 values in this example are purely illustrative and not reliable.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">power_res</span></span>
-<span><span class="co">#&gt; NULL</span></span></code></pre></div>
+<span><span class="co">#&gt;   minCellsPerSamp maxCellsPerSamp nSubjsPerGroup sim condition1 condition2</span></span>
+<span><span class="co">#&gt; 1             200             200              3   1      time0      time1</span></span>
+<span><span class="co">#&gt; 2             200             200              3   2      time0      time1</span></span>
+<span><span class="co">#&gt; 3             100             100              6   1      time0      time1</span></span>
+<span><span class="co">#&gt; 4             100             100              6   2      time0      time1</span></span>
+<span><span class="co">#&gt;       power</span></span>
+<span><span class="co">#&gt; 1 0.5555556</span></span>
+<span><span class="co">#&gt; 2 1.0000000</span></span>
+<span><span class="co">#&gt; 3 0.4827586</span></span>
+<span><span class="co">#&gt; 4 0.7000000</span></span></code></pre></div>
 <p>When run with a full data set and more simulations, the output can be
 summarized with power curves or other visuals to explore design
 trade-offs.</p>
@@ -474,36 +407,40 @@ trade-offs.</p>
 <span><span class="co">#&gt; [11] matrixStats_1.5.0           rescueSim_0.99.0           </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;  [1] tidyselect_1.2.1        viridisLite_0.4.2       dplyr_1.1.4            </span></span>
-<span><span class="co">#&gt;  [4] vipor_0.4.7             farver_2.1.2            viridis_0.6.5          </span></span>
-<span><span class="co">#&gt;  [7] fastmap_1.2.0           bluster_1.18.0          digest_0.6.37          </span></span>
-<span><span class="co">#&gt; [10] rsvd_1.0.5              lifecycle_1.0.4         cluster_2.1.8.1        </span></span>
-<span><span class="co">#&gt; [13] statmod_1.5.0           magrittr_2.0.3          compiler_4.5.1         </span></span>
-<span><span class="co">#&gt; [16] rlang_1.1.6             sass_0.4.10             tools_4.5.1            </span></span>
-<span><span class="co">#&gt; [19] igraph_2.1.4            yaml_2.3.10             data.table_1.17.6      </span></span>
-<span><span class="co">#&gt; [22] knitr_1.50              dqrng_0.4.1             S4Arrays_1.8.1         </span></span>
-<span><span class="co">#&gt; [25] DelayedArray_0.34.1     plyr_1.8.9              RColorBrewer_1.1-3     </span></span>
-<span><span class="co">#&gt; [28] abind_1.4-8             BiocParallel_1.42.1     desc_1.4.3             </span></span>
-<span><span class="co">#&gt; [31] grid_4.5.1              beachmat_2.24.0         edgeR_4.6.2            </span></span>
-<span><span class="co">#&gt; [34] ggplot2_3.5.2           scales_1.4.0            gtools_3.9.5           </span></span>
-<span><span class="co">#&gt; [37] MAST_1.33.0             cli_3.6.5               rmarkdown_2.29         </span></span>
-<span><span class="co">#&gt; [40] crayon_1.5.3            ragg_1.4.0              metapod_1.16.0         </span></span>
-<span><span class="co">#&gt; [43] httr_1.4.7              reshape2_1.4.4          scuttle_1.18.0         </span></span>
-<span><span class="co">#&gt; [46] ggbeeswarm_0.7.2        cachem_1.1.0            stringr_1.5.1          </span></span>
-<span><span class="co">#&gt; [49] parallel_4.5.1          XVector_0.48.0          vctrs_0.6.5            </span></span>
-<span><span class="co">#&gt; [52] Matrix_1.7-3            jsonlite_2.0.0          BiocSingular_1.24.0    </span></span>
-<span><span class="co">#&gt; [55] BiocNeighbors_2.2.0     ggrepel_0.9.6           irlba_2.3.5.1          </span></span>
-<span><span class="co">#&gt; [58] beeswarm_0.4.0          scater_1.36.0           systemfonts_1.2.3      </span></span>
-<span><span class="co">#&gt; [61] locfit_1.5-9.12         limma_3.64.1            jquerylib_0.1.4        </span></span>
-<span><span class="co">#&gt; [64] glue_1.8.0              pkgdown_2.1.3           codetools_0.2-20       </span></span>
-<span><span class="co">#&gt; [67] stringi_1.8.7           gtable_0.3.6            UCSC.utils_1.4.0       </span></span>
-<span><span class="co">#&gt; [70] ScaledMatrix_1.16.0     tibble_3.3.0            pillar_1.10.2          </span></span>
-<span><span class="co">#&gt; [73] htmltools_0.5.8.1       GenomeInfoDbData_1.2.14 R6_2.6.1               </span></span>
-<span><span class="co">#&gt; [76] textshaping_1.0.1       evaluate_1.0.4          lattice_0.22-7         </span></span>
-<span><span class="co">#&gt; [79] backports_1.5.0         scran_1.36.0            bslib_0.9.0            </span></span>
-<span><span class="co">#&gt; [82] Rcpp_1.0.14             gridExtra_2.3           SparseArray_1.8.0      </span></span>
-<span><span class="co">#&gt; [85] checkmate_2.3.2         xfun_0.52               fs_1.6.6               </span></span>
-<span><span class="co">#&gt; [88] pkgconfig_2.0.3</span></span></code></pre></div>
+<span><span class="co">#&gt;   [1] Rdpack_2.6.4            MAST_1.33.0             gridExtra_2.3          </span></span>
+<span><span class="co">#&gt;   [4] rlang_1.1.6             magrittr_2.0.3          scater_1.36.0          </span></span>
+<span><span class="co">#&gt;   [7] compiler_4.5.1          systemfonts_1.2.3       vctrs_0.6.5            </span></span>
+<span><span class="co">#&gt;  [10] reshape2_1.4.4          stringr_1.5.1           pkgconfig_2.0.3        </span></span>
+<span><span class="co">#&gt;  [13] crayon_1.5.3            fastmap_1.2.0           backports_1.5.0        </span></span>
+<span><span class="co">#&gt;  [16] XVector_0.48.0          scuttle_1.18.0          rmarkdown_2.29         </span></span>
+<span><span class="co">#&gt;  [19] nloptr_2.2.1            UCSC.utils_1.4.0        ggbeeswarm_0.7.2       </span></span>
+<span><span class="co">#&gt;  [22] ragg_1.4.0              xfun_0.52               bluster_1.18.0         </span></span>
+<span><span class="co">#&gt;  [25] cachem_1.1.0            beachmat_2.24.0         jsonlite_2.0.0         </span></span>
+<span><span class="co">#&gt;  [28] progress_1.2.3          DelayedArray_0.34.1     BiocParallel_1.42.1    </span></span>
+<span><span class="co">#&gt;  [31] prettyunits_1.2.0       irlba_2.3.5.1           parallel_4.5.1         </span></span>
+<span><span class="co">#&gt;  [34] cluster_2.1.8.1         R6_2.6.1                bslib_0.9.0            </span></span>
+<span><span class="co">#&gt;  [37] stringi_1.8.7           RColorBrewer_1.1-3      limma_3.64.1           </span></span>
+<span><span class="co">#&gt;  [40] boot_1.3-31             jquerylib_0.1.4         Rcpp_1.0.14            </span></span>
+<span><span class="co">#&gt;  [43] knitr_1.50              Matrix_1.7-3            splines_4.5.1          </span></span>
+<span><span class="co">#&gt;  [46] igraph_2.1.4            tidyselect_1.2.1        abind_1.4-8            </span></span>
+<span><span class="co">#&gt;  [49] yaml_2.3.10             viridis_0.6.5           codetools_0.2-20       </span></span>
+<span><span class="co">#&gt;  [52] lattice_0.22-7          tibble_3.3.0            plyr_1.8.9             </span></span>
+<span><span class="co">#&gt;  [55] evaluate_1.0.4          desc_1.4.3              pillar_1.10.2          </span></span>
+<span><span class="co">#&gt;  [58] checkmate_2.3.2         reformulas_0.4.1        hms_1.1.3              </span></span>
+<span><span class="co">#&gt;  [61] ggplot2_3.5.2           scales_1.4.0            minqa_1.2.8            </span></span>
+<span><span class="co">#&gt;  [64] gtools_3.9.5            glue_1.8.0              metapod_1.16.0         </span></span>
+<span><span class="co">#&gt;  [67] tools_4.5.1             BiocNeighbors_2.2.0     data.table_1.17.6      </span></span>
+<span><span class="co">#&gt;  [70] ScaledMatrix_1.16.0     lme4_1.1-37             locfit_1.5-9.12        </span></span>
+<span><span class="co">#&gt;  [73] fs_1.6.6                scran_1.36.0            grid_4.5.1             </span></span>
+<span><span class="co">#&gt;  [76] rbibutils_2.3           edgeR_4.6.2             nlme_3.1-168           </span></span>
+<span><span class="co">#&gt;  [79] GenomeInfoDbData_1.2.14 beeswarm_0.4.0          BiocSingular_1.24.0    </span></span>
+<span><span class="co">#&gt;  [82] vipor_0.4.7             cli_3.6.5               rsvd_1.0.5             </span></span>
+<span><span class="co">#&gt;  [85] textshaping_1.0.1       S4Arrays_1.8.1          viridisLite_0.4.2      </span></span>
+<span><span class="co">#&gt;  [88] dplyr_1.1.4             gtable_0.3.6            sass_0.4.10            </span></span>
+<span><span class="co">#&gt;  [91] digest_0.6.37           SparseArray_1.8.0       ggrepel_0.9.6          </span></span>
+<span><span class="co">#&gt;  [94] dqrng_0.4.1             farver_2.1.2            htmltools_0.5.8.1      </span></span>
+<span><span class="co">#&gt;  [97] pkgdown_2.1.3           lifecycle_1.0.4         httr_1.4.7             </span></span>
+<span><span class="co">#&gt; [100] statmod_1.5.0           MASS_7.3-65</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
