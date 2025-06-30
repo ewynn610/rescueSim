@@ -1,5 +1,5 @@
 ---
-title: "rescueSim: REpeated measures Single Cell RNA-seqUEncing data SIMulation"
+title: "Intro to rescueSim"
 output:
   html_document:
     toc: true
