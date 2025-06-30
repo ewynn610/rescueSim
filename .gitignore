@@ -9,3 +9,4 @@ data-raw
 ^\.Rproj\.user$
 *.Rproj
 .DS_Store
+docs

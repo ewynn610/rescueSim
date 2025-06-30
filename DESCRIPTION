@@ -35,5 +35,5 @@ RoxygenNote: 7.3.2
 Depends: 
     R (>= 4.4.0)
 LazyData: false
-URL: https://github.com/ewynn610/rescueSim
+URL: https://github.com/ewynn610/rescueSim, https://ewynn610.github.io/rescueSim/
 BugReports: https://github.com/ewynn610/rescueSim/issues
