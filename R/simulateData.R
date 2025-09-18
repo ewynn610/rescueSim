@@ -392,9 +392,11 @@ simRescueData <- function(paramObj) {
             condition_names <- paste0("time", 1:(nTimepoints - 1))
         } else {
             colNames <- paste0("time", time, "_group", group)
-            condition_names <- unlist(lapply(1:(nTimepoints - 1), function(t) {
+            condition_names <- unlist(lapply(0:(nTimepoints - 1), function(t) {
                 paste0("time", t, "_group", 0:1)
             }))
+            ## Remove reference
+            condition_names<-condition_names[condition_names!="time0_group0"]
         }
 
         # Build deLog2FC list
