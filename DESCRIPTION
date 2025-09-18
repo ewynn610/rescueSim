@@ -1,7 +1,7 @@
 Type: Package
 Package: rescueSim
 Title: Repeated Measures Single Cell RNA-sequencing Data Simulation
-Version: 0.99.0
+Version: 1.0.0.9000
 Authors@R: c(person("Elizabeth", "Wynn",role = c("aut", "cre"), email = "wynne@njhealth.org"))
 Description: A package for simulating data from repeated measures scRNA-seq studies.
 License: MIT + file LICENSE
