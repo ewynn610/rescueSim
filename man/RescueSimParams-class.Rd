@@ -80,6 +80,11 @@ of sample-level multiplicative factors. Larger values result in more
 variation in amount of between-sample variation across different genes.
 Must be a value >=0}
 
+\item{\code{customSampleFacVar}}{An optional numeric vector of gene-specific variance
+values for sample-level multiplicative factors. Values must be >=0.
+When not provided, variance values are drawn from a distribution using
+\code{sampleFacVarMean} and \code{sampleFacVarSD} as parameters}
+
 \item{\code{subjectFacVarMean}}{Mean used for drawing variance (log-scale) of
 subject-level multiplicative factors. Larger values result in larger
 between-subject variation.}
@@ -88,6 +93,11 @@ between-subject variation.}
 (log-scale) of subject-level multiplicative factors. Larger values result in
 more variation in amount of between-subject variation across different genes.
 Must be a value >=0.}
+
+\item{\code{customSubjectFacVar}}{An optional numeric vector of gene-specific variance
+values for subject-level multiplicative factors. Values must be >=0.
+When not provided, variance values are drawn from a distribution using
+\code{subjectFacVarMean} and \code{subjectFacVarSD} as parameters}
 
 \item{\code{propDE}}{Proportion of genes differentially expressed between
 timepoints/groups. Must be a numeric value between 0 and 1.}
