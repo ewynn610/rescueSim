@@ -132,8 +132,10 @@ setClass("RescueSimParams",
              dispersion = "numeric",
              sampleFacVarMean = "numeric",
              sampleFacVarSD = "numeric",
+             customSampleFacVar = "numeric",
              subjectFacVarMean = "numeric",
              subjectFacVarSD = "numeric",
+             customSubjectFacVar="numeric",
              propDE = "numeric",
              deLog2FC = "ANY"
          )
@@ -258,6 +260,7 @@ rescueSimParamsValidity <- function(object) {
 
     error_string <- c(
         singleValueError, deLog2FCError,geneParamLengthError, cellsPerSampError,
+        paramValuesError,
         propDEError
     )
 
@@ -357,7 +360,9 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
         exprsMean = "lteq",
         dispersion = "lteq",
         sampleFacVarSD = "lt",
+        customSampleFacVar = "lt",
         subjectFacVarSD = "lt",
+        customSubjectFacVar = "lt",
         nSubjsPerGroup = "lteq",
         nTimepoints = "lteq",
         maxCellsPerSamp = "lteq",
@@ -483,6 +488,17 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
                           paste(bad_keys, collapse = ", "))
             errors <- c(errors, msg)
         }
+    }
+
+    # If custom var factors are provided, must be the same length as exprsMean
+    # Check exprsMean and dispersion lengths
+    if (param_lengths["exprsMean"] != param_lengths["customSampleFacVar"] &&
+        ( param_lengths["customSampleFacVar"] != 0)) {
+        errors <- c(errors, "Parameters exprsMean and customSampleFacVar must be vectors of equal length")
+    }
+    if (param_lengths["exprsMean"] != param_lengths["customSubjectFacVar"] &&
+        ( param_lengths["customSubjectFacVar"] != 0)) {
+        errors <- c(errors, "Parameters exprsMean and customSubjectFacVar must be vectors of equal length")
     }
 
     if (length(errors) == 0) return(NULL)

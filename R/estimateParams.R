@@ -168,7 +168,7 @@ estRescueSimParams <- function(sce, paramObj = NULL,
     ## Go through estimation process if any need to be estimated
     if (any(est_indicator)) {
         ## Never estimate customLibSizes
-        est_indicator["customLibSizes"] = F
+        est_indicator[c("customLibSizes", "customSampleFacVar", "customSubjectFacVar")] = F
 
         ## Check if data needs to be normalized
         norm_data_slots <- c(

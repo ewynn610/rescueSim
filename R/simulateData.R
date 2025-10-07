@@ -56,7 +56,7 @@ simRescueData <- function(paramObj) {
 
     ## Make sure no parameter (besides customLibSizes) is equal to zero
     check_empty <- vapply(
-        methods::slotNames(paramObj)[methods::slotNames(paramObj)!="customLibSizes"], function(slot) {
+        methods::slotNames(paramObj)[!methods::slotNames(paramObj)%in%c("customLibSizes", "customSampleFacVar","customSubjectFacVar")], function(slot) {
             length(getRescueSimParam(paramObj, slot)) == 0
         },
         logical(1)
@@ -85,6 +85,8 @@ simRescueData <- function(paramObj) {
     nGenes <- length(exprsMean)
     batchVars <- .drawBatchVars(
         nGenes,
+        getRescueSimParam(paramObj, "customSampleFacVar"),
+        getRescueSimParam(paramObj, "customSubjectFacVar"),
         getRescueSimParam(paramObj, "sampleFacVarMean"),
         getRescueSimParam(paramObj, "sampleFacVarSD"),
         getRescueSimParam(paramObj, "subjectFacVarMean"),
@@ -255,15 +257,22 @@ simRescueData <- function(paramObj) {
 }
 
 
-.drawBatchVars <- function(n_genes,
+.drawBatchVars <- function(n_genes, sampFacVar, subjFacVar,
                            sampleFacVarMean, sampleFacVarSD,
                            subjectFacVarMean, subjectFacVarSD, nTimepoints) {
+
     if(nTimepoints==1){
         samp_var=NA
+    }else if(length(sampFacVar) != 0){
+        samp_var=sampFacVar
     }else{
         samp_var <- stats::rlnorm(n_genes, sampleFacVarMean, sampleFacVarSD)
     }
-    subj_var <- stats::rlnorm(n_genes, subjectFacVarMean, subjectFacVarSD)
+    if(length(subjFacVar) != 0){
+        subj_var=subjFacVar
+    }else{
+        subj_var <- stats::rlnorm(n_genes, subjectFacVarMean, subjectFacVarSD)
+    }
     ret <- data.frame(samp_var = samp_var, subj_var = subj_var)
 }
 

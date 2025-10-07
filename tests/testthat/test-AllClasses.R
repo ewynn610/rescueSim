@@ -12,7 +12,7 @@ fullParams <- RescueSimParams(
 test_that("getRescueSimParam working", {
   expect_equal(
     lapply(slotNames(fullParams), getRescueSimParam, paramObj = fullParams),
-    list(1, FALSE, 1, 1, 1, 1, 1, 1, numeric(0), c(1, 1, 1), c(1, 1, 1), 1, 1, 1, 1, 0, 0)
+    list(1, FALSE, 1, 1, 1, 1, 1, 1, numeric(0), c(1, 1, 1), c(1, 1, 1), 1, 1,numeric(0), 1, 1,numeric(0), 0, 0)
   )
 })
 
