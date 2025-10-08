@@ -425,13 +425,15 @@ setValidity("RescueSimParams", rescueSimParamsValidity)
             expected_names <- "group1"
             forbidden_name <- "group0"
         } else if (!twoGroupDesign) {
-            expected_names <- paste0("time", 0:(nTimepoints - 1))
+            expected_names <- paste0("time", 1:(nTimepoints - 1))
             forbidden_name <- "time0"
         } else {
             expected_names <- unlist(lapply(0:(nTimepoints - 1), function(t) {
                 paste0("time", t, "_group", 0:1)
             }))
             forbidden_name <- "time0_group0"
+            expected_names<-expected_names[expected_names!=forbidden_name]
+
         }
 
         provided_names <- names(deLog2FC)
