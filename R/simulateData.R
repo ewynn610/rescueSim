@@ -314,9 +314,9 @@ simRescueData <- function(paramObj) {
             b_temp <- vapply(alpha_samp, function(alpha) {
                 x <- gtools::rdirichlet(1, rep(alpha, nSampsPerSubj)) * nSampsPerSubj
                 if (any(is.na(x))) {
-                    x <- rep(0, nSubjsPerGroup)
-                    x[sample(seq_len(nSubjsPerGroup), 1)] <- 1
-                    x <- x * nSubjsPerGroup
+                    x <- rep(0, nSampsPerSubj)
+                    x[sample(seq_len(nSampsPerSubj), 1)] <- 1
+                    x <- x * nSampsPerSubj
                 }
                 return(x)
             }, FUN.VALUE = numeric(nSampsPerSubj))
